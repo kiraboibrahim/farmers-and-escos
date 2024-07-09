@@ -4,6 +4,8 @@ import { INestApplication, VersioningType } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+declare const module: any;
+
 async function bootstrap() {
   const PORT = 3000;
   const app = await NestFactory.create(AppModule);
@@ -12,6 +14,11 @@ async function bootstrap() {
   setupSwagger(app);
   setupCrossOrigin(app);
   await app.listen(PORT);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 
 function setupVersioning(app: INestApplication) {
