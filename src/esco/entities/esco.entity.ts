@@ -8,9 +8,13 @@ import {
 } from 'typeorm';
 import { hash } from '@core/core.utils';
 import { Exclude } from 'class-transformer';
+import * as argon2 from 'argon2';
+import { Role } from '../../role/role.constants';
 
 @Entity()
 export class Esco extends BaseEntity {
+  static USERNAME_FIELD = 'phoneNumber' as const;
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -39,10 +43,10 @@ export class Esco extends BaseEntity {
   @Column()
   numEmployees: number;
 
-  @Column()
+  @Column({ nullable: true })
   profilePhoto: string;
 
-  @Column()
+  @Column({ nullable: true })
   coverPhoto: string;
 
   @Column({ type: 'date' })
@@ -54,9 +58,23 @@ export class Esco extends BaseEntity {
   @Column()
   specialization: string;
 
+  get role() {
+    return Role.ESCO;
+  }
+
+  static async findByUsername(username: string) {
+    return await this.findOneBy({ [this.USERNAME_FIELD]: username });
+  }
+
+  async hasPassword(password: string) {
+    return await argon2.verify(this.password, password);
+  }
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    this.password = await hash(this.password);
+    if (this.password) {
+      this.password = await hash(this.password);
+    }
   }
 }

@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { EscoService } from './esco.service';
 import { CreateEscoDto } from './dto/create-esco.dto';
 import { UpdateEscoDto } from './dto/update-esco.dto';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @Controller('esco')
 export class EscoController {
@@ -13,8 +22,8 @@ export class EscoController {
   }
 
   @Get()
-  findAll() {
-    return this.escoService.findAll();
+  findAll(@Paginate() query: PaginateQuery) {
+    return this.escoService.findAll(query);
   }
 
   @Get(':id')
