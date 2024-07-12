@@ -24,8 +24,8 @@ export class Esco extends BaseEntity {
   @Column()
   email: string;
 
-  @Exclude()
   @Column()
+  @Exclude()
   password: string;
 
   @Column()

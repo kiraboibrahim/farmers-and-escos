@@ -1,12 +1,11 @@
 import {
-  IsAlpha,
   IsEmail,
+  IsFQDN,
   IsInt,
   IsISO8601,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
-  IsUrl,
 } from 'class-validator';
 import {
   IsStrongPassword,
@@ -16,7 +15,7 @@ import {
 import { Esco } from '@esco/entities/esco.entity';
 
 export class CreateEscoDto {
-  @IsAlpha()
+  @IsNotEmpty()
   name: string;
 
   @IsEmail()
@@ -25,14 +24,7 @@ export class CreateEscoDto {
   @IsStrongPassword()
   password: string;
 
-  @IsUrl({
-    require_host: true,
-    require_tld: true,
-    protocols: ['https'],
-    require_protocol: true,
-    allow_query_components: false,
-    allow_fragments: false,
-  })
+  @IsFQDN({ require_tld: true })
   website: string;
 
   @IsUnique<Esco>({ entityClass: Esco, findByColumnName: 'phoneNumber' })
@@ -50,6 +42,9 @@ export class CreateEscoDto {
 
   @IsISO8601()
   incorporationDate: string;
+
+  @IsNotEmpty()
+  registrationNumber: string;
 
   @IsNotEmpty()
   specialization: string;

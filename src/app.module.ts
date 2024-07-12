@@ -16,6 +16,7 @@ import { InstallationModule } from '@installation/installation.module';
 import { DatabaseModule } from '@database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ProductCategoryModule } from './product-category/product-category.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
     InstallationModule,
     DatabaseModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    ProductCategoryModule,
   ],
   controllers: [AppController],
   providers: [
@@ -43,7 +45,7 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
     },
     {
       provide: APP_INTERCEPTOR,
-      useValue: ClassSerializerInterceptor,
+      useClass: ClassSerializerInterceptor,
     },
   ],
 })

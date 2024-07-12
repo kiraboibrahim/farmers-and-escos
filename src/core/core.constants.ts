@@ -13,3 +13,15 @@ export const MIN_UPPERCASE_IN_PASSWORD = 4;
 
 // Pagination Settings
 export const MAX_ITEMS_PER_PAGE = 20;
+
+// File uploads
+export const MAX_FILE_SIZE = 2.5 * 1024 * 1024; // 2.5 MBs
+
+export enum Resource {
+  ESCO = 'ESCO',
+  FARMER = 'FARMER',
+  PRODUCT = 'PRODUCT',
+  INSTALLATION = 'INSTALLATION',
+  IOT = 'IOT',
+  OFFER = 'OFFER',
+}

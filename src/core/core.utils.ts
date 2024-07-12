@@ -20,10 +20,19 @@ export const hash = async (value: string) => {
   return await argon.hash(value);
 };
 
-export function isUGPhoneNumber(phoneNumber: string) {
+export const isUGPhoneNumber = (phoneNumber: string) => {
   return (
     MTN_UG_REGEX.test(phoneNumber) ||
     AIRTEL_UG_REGEX.test(phoneNumber) ||
     LYCA_UG_REGEX.test(phoneNumber)
   );
-}
+};
+
+export const isEmpty = (obj: any) => {
+  for (const prop in obj) {
+    if (obj.hasOwnProperty(prop) && obj[prop] !== undefined) {
+      return false;
+    }
+  }
+  return true;
+};

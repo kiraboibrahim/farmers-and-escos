@@ -6,12 +6,18 @@ import { Esco } from '@esco/entities/esco.entity';
 import { Repository } from 'typeorm';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
 import { ESCO_PAGINATION_CONFIG } from '@esco/esco.pagination.config';
+import { StorageService } from '@storage/storage.service';
+import { Resource } from '@core/core.constants';
+import { BaseService } from '@core/core.base';
 
 @Injectable()
-export class EscoService {
+export class EscoService extends BaseService {
   constructor(
+    private storageService: StorageService,
     @InjectRepository(Esco) private escoRepository: Repository<Esco>,
-  ) {}
+  ) {
+    super();
+  }
 
   async create(createEscoDto: CreateEscoDto) {
     const esco = this.escoRepository.create(createEscoDto);
@@ -28,6 +34,21 @@ export class EscoService {
 
   async update(id: number, updateEscoDto: UpdateEscoDto) {
     return await Esco.update({ id }, updateEscoDto);
+  }
+
+  async uploadPhotos(id: number, { coverPhoto, profilePhoto }) {
+    const [coverPhotoUrl, profilePhotoUrl] =
+      await this.storageService.uploadBatch(
+        [coverPhoto, profilePhoto],
+        Resource.ESCO,
+        id,
+      );
+    const photoUpdateDto = {
+      coverPhoto: coverPhotoUrl,
+      profilePhoto: profilePhotoUrl,
+    };
+    this.handleMissingUpdateValues(photoUpdateDto);
+    return await Esco.update({ id }, photoUpdateDto);
   }
 
   async remove(id: number) {

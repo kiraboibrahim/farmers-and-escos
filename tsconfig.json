@@ -37,6 +37,12 @@
       ],
       "@database/*": [
         "./src/database/*"
+      ],
+      "@storage/*": [
+        "./src/storage/*"
+      ],
+      "@product-categories/*": [
+        "./src/product-categories/*"
       ]
     },
     "incremental": true,

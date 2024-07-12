@@ -27,11 +27,14 @@ export class Farmer extends BaseEntity {
   @Column()
   phoneNumber: string;
 
-  @Exclude()
   @Column()
+  @Exclude()
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
+  coverPhoto: string;
+
+  @Column({ nullable: true })
   profilePhoto: string;
 
   @Column()

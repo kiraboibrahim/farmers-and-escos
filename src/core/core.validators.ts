@@ -1,4 +1,6 @@
 import {
+  isArray,
+  isEmpty,
   isString,
   IsStrongPassword as _IsStrongPassword,
   Validate,
@@ -17,9 +19,10 @@ import {
 } from '@core/core.constants';
 import { isUGPhoneNumber } from '@core/core.utils';
 import { EntityClass, EntityColumnName } from '@core/core.types';
+import { FindOptionsRelations, In } from 'typeorm';
 
 @ValidatorConstraint({ async: true })
-export class _IsUnique implements ValidatorConstraintInterface {
+class _IsUnique implements ValidatorConstraintInterface {
   async validate(value: any, validationArguments: ValidationArguments) {
     if (!value) return false;
     const [entityClass, findByColumnName] = validationArguments.constraints;
@@ -42,6 +45,113 @@ export const IsUnique = function <T>({
   findByColumnName: EntityColumnName<T>;
 }) {
   return Validate(_IsUnique, [entityClass, findByColumnName]);
+};
+
+@ValidatorConstraint({ async: true })
+class _LoadEntity implements ValidatorConstraintInterface {
+  async validate(value: any, validationArguments: ValidationArguments) {
+    if (isEmpty(value)) return false;
+    const [
+      entityClass,
+      property = validationArguments.property,
+      findByColumnName,
+      relations,
+      allowNull,
+    ] = validationArguments.constraints;
+    const whereOptions = { [findByColumnName]: value };
+    const entity = await entityClass.findOne({
+      where: whereOptions,
+      relations,
+    });
+    const entityExists = !!entity || allowNull;
+    if (entityExists) {
+      const { object } = validationArguments;
+      Object.defineProperty(object, property, {
+        value: entity,
+        writable: false,
+      });
+    }
+    return entityExists;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  defaultMessage(validationArguments?: ValidationArguments): string {
+    return `${validationArguments?.property} doesn't exist`;
+  }
+}
+
+export const LoadEntity = function <T>({
+  entityClass,
+  accessEntityByProperty,
+  findByColumnName = 'id',
+  relations = undefined,
+  allowNull = false,
+}: {
+  entityClass: EntityClass<T>;
+  accessEntityByProperty: string;
+  findByColumnName?: EntityColumnName<T> | 'id';
+  relations?: FindOptionsRelations<T>;
+  allowNull?: boolean;
+}) {
+  return Validate(_LoadEntity, [
+    entityClass,
+    accessEntityByProperty,
+    findByColumnName,
+    relations,
+    allowNull,
+  ]);
+};
+
+@ValidatorConstraint({ async: true })
+export class _LoadEntities implements ValidatorConstraintInterface {
+  async validate(value: any, validationArguments: ValidationArguments) {
+    const [
+      entityClass,
+      entitiesHolderProperty = validationArguments.property,
+      findByColumnName,
+      relations,
+      allowMissing,
+    ] = validationArguments.constraints;
+    if (!isArray(value)) return false;
+    const whereOptions = { [findByColumnName]: In(value) };
+    const entities = await entityClass.find({ where: whereOptions, relations });
+    const entitiesExist = entities.length === value.length || allowMissing;
+    if (entitiesExist) {
+      const { object } = validationArguments;
+      Object.defineProperty(object, entitiesHolderProperty, {
+        value: entities,
+        writable: false,
+      });
+    }
+    return entitiesExist;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  defaultMessage(validationArguments?: ValidationArguments): string {
+    return `Some or all values in ${validationArguments?.property} don't exist`;
+  }
+}
+
+export const LoadEntities = function <T>({
+  entityClass,
+  accessEntityByProperty,
+  findByColumnName = 'id',
+  relations = undefined,
+  allowMissing = false,
+}: {
+  entityClass: EntityClass<T>;
+  accessEntityByProperty: string;
+  findByColumnName?: EntityColumnName<T> | 'id';
+  relations?: FindOptionsRelations<T>;
+  allowMissing?: boolean;
+}) {
+  return Validate(_LoadEntities, [
+    entityClass,
+    accessEntityByProperty,
+    findByColumnName,
+    relations,
+    allowMissing,
+  ]);
 };
 
 @ValidatorConstraint({ async: false })
