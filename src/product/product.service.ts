@@ -1,21 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '@product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
-import { PRODUCT_PAGINATION_CONFIG } from '@product/product.pagination.config';
+import {
+  getFavoriteProductPaginationConfig,
+  PRODUCT_PAGINATION_CONFIG,
+} from '@product/product.pagination.config';
 import { ProductCategory } from '../product-category/entities/product-category.entity';
 import { Esco } from '@esco/entities/esco.entity';
 import { BaseService } from '@core/core.base';
 import { StorageService } from '@storage/storage.service';
 import { Resource } from '@core/core.constants';
+import { FavoriteProduct } from '@product/entities/favorite-product.entity';
 
 @Injectable()
 export class ProductService extends BaseService {
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectRepository(FavoriteProduct)
+    private favoriteProductRepository: Repository<FavoriteProduct>,
     private storageService: StorageService,
   ) {
     super();
@@ -116,7 +122,36 @@ export class ProductService extends BaseService {
     return await Product.delete({ id });
   }
 
-  async favoriteProduct(id: number) {}
+  async findFavoriteProducts(query: PaginateQuery) {
+    const { id: farmerId } = this.user;
+    return await paginate(
+      query,
+      this.favoriteProductRepository,
+      getFavoriteProductPaginationConfig(farmerId),
+    );
+  }
 
-  async unfavoriteProduct(id: number) {}
+  async favoriteProduct(id: number) {
+    const { id: farmerId } = this.user;
+    const isAlreadyFavorited = !!(await FavoriteProduct.findOneBy({
+      farmer: { id: farmerId },
+      product: { id },
+    }));
+    if (isAlreadyFavorited) {
+      throw new BadRequestException('Product is already in your favorites');
+    }
+    const favoriteProduct = this.favoriteProductRepository.create({
+      farmer: { id: farmerId },
+      product: { id },
+    });
+    return await this.favoriteProductRepository.save(favoriteProduct);
+  }
+
+  async unfavoriteProduct(id: number) {
+    const { id: farmerId } = this.user;
+    return await FavoriteProduct.delete({
+      farmer: { id: farmerId },
+      product: { id },
+    });
+  }
 }

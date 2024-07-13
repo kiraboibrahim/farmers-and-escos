@@ -14,7 +14,12 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
 import { ImageFieldsInterceptor } from '@core/core.interceptors';
+import { Auth, GetUser, IsPublic } from '@auth/auth.decorators';
+import { Role } from '../role/role.constants';
+import { AllowOnly } from '../role/roles.decorators';
+import { User } from '@auth/auth.types';
 
+@Auth(Role.SUPER_USER, Role.ESCO)
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -24,21 +29,37 @@ export class ProductController {
     return this.productService.create(createProductDto);
   }
 
+  @AllowOnly(Role.FARMER)
+  @Get('favorites')
+  findFavoriteProducts(
+    @GetUser() user: User,
+    @Paginate() query: PaginateQuery,
+  ) {
+    this.productService.setUser(user);
+    return this.productService.findFavoriteProducts(query);
+  }
+
+  @AllowOnly(Role.FARMER)
   @Post(':id/favorites')
-  favoriteProduct(@Param('id') id: number) {
+  favoriteProduct(@Param('id') id: number, @GetUser() user: User) {
+    this.productService.setUser(user);
     return this.productService.favoriteProduct(id);
   }
 
-  @Delete(':id/favorites')
-  unfavoriteProduct(@Param('id') id: number) {
+  @AllowOnly(Role.FARMER)
+  @Delete('favorites/:id')
+  unfavoriteProduct(@Param('id') id: number, @GetUser() user: User) {
+    this.productService.setUser(user);
     return this.productService.unfavoriteProduct(id);
   }
 
+  @IsPublic()
   @Get()
   findAll(@Paginate() query: PaginateQuery) {
     return this.productService.findAll(query);
   }
 
+  @IsPublic()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);

@@ -50,8 +50,8 @@ export class EscoController {
     },
   ) {
     return this.escoService.uploadPhotos(+id, {
-      coverPhoto: files.coverPhoto?.at(0),
-      profilePhoto: files.profilePhoto?.at(0),
+      coverPhoto: files?.coverPhoto?.at(0),
+      profilePhoto: files?.profilePhoto?.at(0),
     });
   }
 
