@@ -1,8 +1,8 @@
 import { ProductCategory } from '../../product-category/entities/product-category.entity';
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
-  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -10,6 +10,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Esco } from '@esco/entities/esco.entity';
+import { DateTimeFormatter, ZonedDateTime, ZoneId } from '@js-joda/core';
+
+require('@js-joda/timezone');
 
 @Entity()
 export class Product extends BaseEntity {
@@ -28,7 +31,7 @@ export class Product extends BaseEntity {
   @Column({ default: false })
   isFeatured: boolean;
 
-  @CreateDateColumn()
+  @Column({ type: 'datetime' })
   createdAt: string;
 
   @Column({ nullable: true })
@@ -52,4 +55,11 @@ export class Product extends BaseEntity {
 
   @ManyToOne(() => Esco, { eager: true, onDelete: 'CASCADE' })
   esco: Esco;
+
+  @BeforeInsert()
+  setCreatedAt() {
+    const timezone = process.env.TZ;
+    const now = ZonedDateTime.now(ZoneId.of(timezone));
+    this.createdAt = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+  }
 }
