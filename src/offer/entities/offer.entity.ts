@@ -17,6 +17,9 @@ export class Offer {
   @Column({ type: 'date' })
   expiryDate: string;
 
+  @Column({ type: 'boolean' })
+  isAccepted: boolean;
+
   @Column()
   invoice: string;
 

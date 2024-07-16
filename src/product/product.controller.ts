@@ -18,6 +18,7 @@ import { Auth, GetUser, IsPublic } from '@auth/auth.decorators';
 import { Role } from '../role/role.constants';
 import { AllowOnly } from '../role/roles.decorators';
 import { User } from '@auth/auth.types';
+import { ProductExists } from '@product/product.validators';
 
 @Auth(Role.SUPER_USER, Role.ESCO)
 @Controller('products')
@@ -41,7 +42,7 @@ export class ProductController {
 
   @AllowOnly(Role.FARMER)
   @Post(':id/favorites')
-  favoriteProduct(@Param('id') id: number, @GetUser() user: User) {
+  favoriteProduct(@ProductExists('id') id: number, @GetUser() user: User) {
     this.productService.setUser(user);
     return this.productService.favoriteProduct(id);
   }

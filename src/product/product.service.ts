@@ -133,11 +133,11 @@ export class ProductService extends BaseService {
 
   async favoriteProduct(id: number) {
     const { id: farmerId } = this.user;
-    const isAlreadyFavorited = !!(await FavoriteProduct.findOneBy({
+    const isProductFavorited = !!(await FavoriteProduct.findOneBy({
       farmer: { id: farmerId },
       product: { id },
     }));
-    if (isAlreadyFavorited) {
+    if (isProductFavorited) {
       throw new BadRequestException('Product is already in your favorites');
     }
     const favoriteProduct = this.favoriteProductRepository.create({
