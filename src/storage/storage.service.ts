@@ -22,7 +22,11 @@ export class StorageService {
     );
     await this.mkdir(dirname);
     const filePath = path.join(dirname, this.getFilename(file));
-    await fsp.writeFile(filePath, file.buffer);
+    if (!!file?.buffer) {
+      await fsp.writeFile(filePath, file.buffer);
+    } else {
+      await fsp.copyFile(file.path, filePath);
+    }
     return this.url(filePath);
   }
 

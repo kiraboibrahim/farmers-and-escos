@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { InstallationService } from './installation.service';
 import { CreateInstallationDto } from './dto/create-installation.dto';
 import { UpdateInstallationDto } from './dto/update-installation.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('installation')
+@ApiTags('Installations')
+@Controller('installations')
 export class InstallationController {
   constructor(private readonly installationService: InstallationService) {}
 
@@ -23,7 +33,10 @@ export class InstallationController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInstallationDto: UpdateInstallationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateInstallationDto: UpdateInstallationDto,
+  ) {
     return this.installationService.update(+id, updateInstallationDto);
   }
 

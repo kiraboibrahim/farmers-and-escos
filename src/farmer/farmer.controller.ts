@@ -12,18 +12,34 @@ import {
 import { FarmerService } from './farmer.service';
 import { CreateFarmerDto } from './dto/create-farmer.dto';
 import { UpdateFarmerDto } from './dto/update-farmer.dto';
-import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
 import { ImageFieldsInterceptor } from '@core/core.interceptors';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FARMER_PAGINATION_CONFIG } from '@farmer/farmer.pagination.config';
+import { UploadFarmerPhotosDto } from '@farmer/dto/upload-farmer-photos.dto';
 
+@ApiTags('Farmers')
 @Controller('farmers')
 export class FarmerController {
   constructor(private readonly farmerService: FarmerService) {}
 
+  @ApiCreatedResponse({ description: 'Farmer has been created successfully' })
+  @ApiBadRequestResponse({
+    description: 'Farmer creation  due to validation errors',
+  })
   @Post()
   create(@Body() createFarmerDto: CreateFarmerDto) {
     return this.farmerService.create(createFarmerDto);
   }
 
+  @ApiPaginationQuery(FARMER_PAGINATION_CONFIG)
   @Get()
   findAll(@Paginate() query: PaginateQuery) {
     return this.farmerService.findAll(query);
@@ -34,6 +50,14 @@ export class FarmerController {
     return this.farmerService.findOne(+id);
   }
 
+  @ApiBadRequestResponse({
+    description: "Farmer's photos upload failed due to validation errors",
+  })
+  @ApiOkResponse({
+    description: "Farmer's photo(s) have been uploaded successfully",
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadFarmerPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
     ImageFieldsInterceptor([
@@ -55,6 +79,12 @@ export class FarmerController {
     });
   }
 
+  @ApiBadRequestResponse({
+    description: 'Farmer update failed due to validation errors',
+  })
+  @ApiOkResponse({
+    description: 'Farmer has been updated successfully',
+  })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFarmerDto: UpdateFarmerDto) {
     return this.farmerService.update(+id, updateFarmerDto);

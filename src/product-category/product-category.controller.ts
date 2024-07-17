@@ -2,7 +2,9 @@ import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { ProductCategoryService } from './product-category.service';
 import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Product Categories')
 @Controller('product-categories')
 export class ProductCategoryController {
   constructor(
@@ -19,6 +21,9 @@ export class ProductCategoryController {
     return this.productCategoryService.findCategoryProducts(+id, query);
   }
 
+  @ApiOkResponse({
+    description: 'Product category has been updated successfully',
+  })
   @Patch(':id')
   update(
     @Param('id') id: string,

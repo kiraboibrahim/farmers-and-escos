@@ -29,7 +29,11 @@ import { ProductCategoryModule } from './product-category/product-category.modul
     IotModule,
     InstallationModule,
     DatabaseModule,
-    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+      expandVariables: true,
+    }),
     ProductCategoryModule,
   ],
   controllers: [AppController],

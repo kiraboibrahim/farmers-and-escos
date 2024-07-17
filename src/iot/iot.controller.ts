@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { IotService } from './iot.service';
 import { CreateIotDto } from './dto/create-iot.dto';
 import { UpdateIotDto } from './dto/update-iot.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('iot')
+@ApiTags('IOTs')
+@Controller('iots')
 export class IotController {
   constructor(private readonly iotService: IotService) {}
 
