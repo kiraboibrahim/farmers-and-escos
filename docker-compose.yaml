@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - app-uploads:$UPLOAD_DIR
+    ports:
+      - 3000:3000
+    env_file: .env
+    environment:
+      - DB_HOST=db
+
+    depends_on:
+      db:
+        condition: service_started
+  db:
+    image: mysql:lts-oraclelinux9
+    ports:
+      - '3306:3306'
+      - '33060:33060'
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
+      - MYSQL_USER=$DB_USERNAME
+      - MYSQL_PASSWORD=$DB_PASSWORD
+      - MYSQL_DATABASE=$DB_NAME
+  http:
+    image: httpd:2.4-alpine
+    volumes:
+      - app-uploads:/usr/local/apache2/htdocs/uploads
+    ports:
+      - '8080:80'
+volumes:
+  db-data:
+  app-uploads:
