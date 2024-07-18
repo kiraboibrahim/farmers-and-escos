@@ -31,7 +31,7 @@ export class Product extends BaseEntity {
   @Column({ default: false })
   isFeatured: boolean;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   createdAt: string;
 
   @Column({ nullable: true })

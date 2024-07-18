@@ -3,12 +3,14 @@ import { AppModule } from './app.module';
 import { INestApplication, VersioningType } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 declare const module: any;
 
 async function bootstrap() {
-  const PORT = 3000;
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const PORT = +configService.get<string>('LISTEN_PORT');
   setupVersioning(app);
   setupClassValidatorContainer(app);
   setupSwagger(app);

@@ -41,7 +41,7 @@ export class Farmer extends BaseEntity {
   farmDescription: string;
 
   @Column()
-  farmSize: number;
+  farmSize: string;
 
   @Column()
   latitude: string;

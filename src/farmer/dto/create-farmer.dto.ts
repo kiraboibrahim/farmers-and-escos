@@ -2,7 +2,7 @@ import {
   IsAlpha,
   IsLatitude,
   IsLongitude,
-  IsNumber,
+  IsNumberString,
   MaxLength,
 } from 'class-validator';
 import { IsStrongPassword, IsUGPhoneNumber } from '@core/core.validators';
@@ -30,8 +30,8 @@ export class CreateFarmerDto {
   farmDescription: string;
 
   @ApiProperty()
-  @IsNumber()
-  farmSize: number;
+  @IsNumberString()
+  farmSize: string;
 
   @ApiProperty()
   @IsLatitude()
