@@ -26,6 +26,7 @@ async function bootstrap() {
 function setupVersioning(app: INestApplication) {
   app.enableVersioning({
     type: VersioningType.URI,
+    defaultVersion: '0.1.0',
   });
 }
 
