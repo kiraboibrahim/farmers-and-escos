@@ -13,6 +13,10 @@ export const PRODUCT_PAGINATION_CONFIG: PaginateConfig<Product> = {
   loadEagerRelations: true,
 };
 
+export const getEscoProductsPaginationConfig = (escoId: number) => {
+  return { ...PRODUCT_PAGINATION_CONFIG, where: { esco: { id: escoId } } };
+};
+
 export const getFavoriteProductPaginationConfig = (
   farmerId: number,
 ): PaginateConfig<FavoriteProduct> => {

@@ -3,6 +3,7 @@ import {
   isEmpty,
   isString,
   IsStrongPassword as _IsStrongPassword,
+  Matches,
   Validate,
   ValidationArguments,
   ValidatorConstraint,
@@ -111,9 +112,12 @@ export class _LoadEntities implements ValidatorConstraintInterface {
       findByColumnName,
       relations,
       allowMissing,
+      filter,
     ] = validationArguments.constraints;
-    if (!isArray(value)) return false;
-    const whereOptions = { [findByColumnName]: In(value) };
+    if (!isArray(value) || (isArray(value) && value.length === 0)) return false;
+    const whereOptions = {
+      [findByColumnName]: In(value.filter((item) => filter(item))),
+    };
     const entities = await entityClass.find({ where: whereOptions, relations });
     const entitiesExist = entities.length === value.length || allowMissing;
     if (entitiesExist) {
@@ -138,12 +142,14 @@ export const LoadEntities = function <T>({
   findByColumnName = 'id',
   relations = undefined,
   allowMissing = false,
+  filter = undefined,
 }: {
   entityClass: EntityClass<T>;
   accessEntityByProperty: string;
   findByColumnName?: EntityColumnName<T> | 'id';
   relations?: FindOptionsRelations<T>;
   allowMissing?: boolean;
+  filter?: (value: any) => boolean;
 }) {
   return Validate(_LoadEntities, [
     entityClass,
@@ -151,6 +157,7 @@ export const LoadEntities = function <T>({
     findByColumnName,
     relations,
     allowMissing,
+    filter,
   ]);
 };
 
@@ -182,4 +189,10 @@ export const IsStrongPassword = () => {
   };
   const message = `Password doesn't meet the requirements: atleast ${MIN_PASSWORD_LENGTH} characters long, atleast ${MIN_LOWERCASE_IN_PASSWORD} lowercase letters, atleast ${MIN_UPPERCASE_IN_PASSWORD} uppercase letters, atleast ${MIN_SYMBOLS_IN_PASSWORD} symbols`;
   return _IsStrongPassword(password_requirements, { message });
+};
+
+export const IsStrongPIN = () => {
+  const pinRegex = /[0-9]{6,}/;
+  const message = 'Your PIN should be atleast 6 digits long';
+  return Matches(pinRegex, { message });
 };

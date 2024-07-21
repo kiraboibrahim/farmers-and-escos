@@ -49,7 +49,10 @@ export class Product extends BaseEntity {
   @Column({ nullable: true })
   photo4: string;
 
-  @ManyToMany(() => ProductCategory, { cascade: ['insert', 'update'] })
+  @ManyToMany(() => ProductCategory, {
+    cascade: ['insert', 'update'],
+    eager: true,
+  })
   @JoinTable()
   categories: ProductCategory[];
 

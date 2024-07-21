@@ -9,12 +9,15 @@ import { ESCO_PAGINATION_CONFIG } from '@esco/esco.pagination.config';
 import { StorageService } from '@storage/storage.service';
 import { Resource } from '@core/core.constants';
 import { BaseService } from '@core/core.base';
+import { Product } from '@product/entities/product.entity';
+import { getEscoProductsPaginationConfig } from '@product/product.pagination.config';
 
 @Injectable()
 export class EscoService extends BaseService {
   constructor(
     private storageService: StorageService,
     @InjectRepository(Esco) private escoRepository: Repository<Esco>,
+    @InjectRepository(Product) private productRepository: Repository<Product>,
   ) {
     super();
   }
@@ -30,6 +33,14 @@ export class EscoService extends BaseService {
 
   async findOne(id: number) {
     return await Esco.findOneBy({ id });
+  }
+
+  async findEscoProducts(escoId: number, query: PaginateQuery) {
+    return await paginate(
+      query,
+      this.productRepository,
+      getEscoProductsPaginationConfig(escoId),
+    );
   }
 
   async update(id: number, updateEscoDto: UpdateEscoDto) {

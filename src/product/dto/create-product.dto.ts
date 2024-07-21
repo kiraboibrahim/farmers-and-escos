@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  isInt,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -35,8 +36,9 @@ export class CreateProductDto {
   })
   @LoadEntities<ProductCategory>({
     entityClass: ProductCategory,
-    allowMissing: true,
     accessEntityByProperty: 'categories',
+    allowMissing: true,
+    filter: isInt,
   })
   categoriesIds: number[] | string[];
 

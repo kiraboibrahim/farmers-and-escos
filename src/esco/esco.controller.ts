@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { ESCO_PAGINATION_CONFIG } from '@esco/esco.pagination.config';
 import { UploadEscoPhotosDto } from '@esco/dto/upload-esco-photos.dto';
+import { PRODUCT_PAGINATION_CONFIG } from '@product/product.pagination.config';
 
 @ApiTags('Escos')
 @Controller('escos')
@@ -48,6 +49,12 @@ export class EscoController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.escoService.findOne(+id);
+  }
+
+  @ApiPaginationQuery(PRODUCT_PAGINATION_CONFIG)
+  @Get(':id/products')
+  findEscoProducts(@Param('id') id: string, @Paginate() query: PaginateQuery) {
+    return this.escoService.findEscoProducts(+id, query);
   }
 
   @ApiBadRequestResponse({
