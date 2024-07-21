@@ -1,0 +1,61 @@
+services:
+  backend:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - app-uploads:$UPLOAD_DIR
+    ports:
+      - ${LISTEN_PORT:?error}:${LISTEN_PORT:?error}
+    env_file: .env
+    environment:
+      - DB_HOST=db
+
+    depends_on:
+      db:
+        condition: service_healthy
+      http:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src
+        - action: rebuild
+          path: package.json
+  db:
+    image: postgres:16.3-bookworm
+    shm_size: 128mb
+    ports:
+      - ${DB_PORT:-5432}:5432
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:?error}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:?error}
+      - POSTGRES_DB=${DB_NAME:?error}
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DB_USERNAME:?error} -d ${DB_NAME:?error}',
+        ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+  http:
+    image: nginx:1.27.0-bookworm
+    volumes:
+      - app-uploads:/usr/share/nginx/html$UPLOAD_URL
+    ports:
+      - '8080:80'
+    healthcheck:
+      test: [ 'CMD-SHELL', 'curl -so /dev/null http://localhost || exit 1' ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+volumes:
+  db-data:
+  app-uploads:

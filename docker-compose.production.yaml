@@ -1,7 +1,7 @@
 services:
   backend:
     image: harmless138/dojohub:0.1.0-farmersescos
-    restart: unless-stopped
+    restart: always
     volumes:
       - app-uploads:$UPLOAD_DIR
     ports:
@@ -20,7 +20,7 @@ services:
     shm_size: 128mb
     ports:
       - ${DB_PORT:-5432}:5432
-    restart: unless-stopped
+    restart: always
     env_file: .env
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -40,12 +40,13 @@ services:
       timeout: 10s
   http:
     image: nginx:1.27.0-bookworm
+    restart: always
     volumes:
       - app-uploads:/usr/share/nginx/html$UPLOAD_URL
     ports:
       - '8080:80'
     healthcheck:
-      test: ['CMD-SHELL', 'curl -so /dev/null http://localhost || exit 1']
+      test: [ 'CMD-SHELL', 'curl -so /dev/null http://localhost || exit 1' ]
       interval: 10s
       retries: 5
       start_period: 30s
