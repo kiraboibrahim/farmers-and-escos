@@ -5,7 +5,7 @@ import {
   IsNumberString,
   MaxLength,
 } from 'class-validator';
-import { IsStrongPassword, IsUGPhoneNumber } from '@core/core.validators';
+import { IsStrongPIN, IsUGPhoneNumber } from '@core/core.validators';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateFarmerDto {
@@ -22,7 +22,7 @@ export class CreateFarmerDto {
   phoneNumber: string;
 
   @ApiProperty()
-  @IsStrongPassword()
+  @IsStrongPIN()
   password: string;
 
   @ApiProperty()
