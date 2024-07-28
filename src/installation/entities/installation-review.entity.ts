@@ -1,6 +1,15 @@
-import { BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  BeforeInsert,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Installation } from '@installation/entities/installation.entity';
+import { Farmer } from '@farmer/entities/farmer.entity';
 
+@Entity()
 export class InstallationReview extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,9 +17,20 @@ export class InstallationReview extends BaseEntity {
   @Column()
   rating: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   comment: string;
 
-  @ManyToOne(() => Installation)
+  @ManyToOne(() => Farmer, { eager: true, onDelete: 'CASCADE' })
+  farmer: Farmer;
+
+  @ManyToOne(() => Installation, { onDelete: 'CASCADE' })
   installation: Installation;
+
+  @BeforeInsert()
+  async markInstallationAsReviewed() {
+    await Installation.update(
+      { id: this.installation.id },
+      { isReviewed: true },
+    );
+  }
 }

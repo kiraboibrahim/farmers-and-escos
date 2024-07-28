@@ -13,7 +13,7 @@ import { EscoService } from './esco.service';
 import { CreateEscoDto } from './dto/create-esco.dto';
 import { UpdateEscoDto } from './dto/update-esco.dto';
 import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
-import { ImageFieldsInterceptor } from '@core/core.interceptors';
+import { PhotoUploadsInterceptor } from '@core/core.interceptors';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -65,7 +65,7 @@ export class EscoController {
   @ApiBody({ type: UploadEscoPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
-    ImageFieldsInterceptor([
+    PhotoUploadsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'profilePhoto', maxCount: 1 },
     ]),

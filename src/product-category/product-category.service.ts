@@ -11,6 +11,7 @@ import { ProductCategory } from './entities/product-category.entity';
 import { Repository } from 'typeorm';
 import { BaseService } from '@core/core.base';
 import { Product } from '@product/entities/product.entity';
+import { CreateProductCategoryDto } from '@product-category/dto/create-product-category.dto';
 
 @Injectable()
 export class ProductCategoryService extends BaseService {
@@ -20,6 +21,12 @@ export class ProductCategoryService extends BaseService {
     @InjectRepository(Product) private productRepository: Repository<Product>,
   ) {
     super();
+  }
+
+  async create(createCategoryDto: CreateProductCategoryDto) {
+    const productCategory =
+      this.productCategoryRepository.create(createCategoryDto);
+    return ProductCategory.save(productCategory);
   }
 
   async findAll(query: PaginateQuery) {

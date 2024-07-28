@@ -41,8 +41,11 @@
       "@storage/*": [
         "./src/storage/*"
       ],
-      "@product-categories/*": [
-        "./src/product-categories/*"
+      "@product-category/*": [
+        "./src/product-category/*"
+      ],
+      "@role/*": [
+        "./src/role/*"
       ]
     },
     "incremental": true,

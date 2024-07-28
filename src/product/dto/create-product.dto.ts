@@ -7,7 +7,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { LoadEntities, LoadEntity } from '@core/core.validators';
-import { ProductCategory } from '../../product-category/entities/product-category.entity';
+import { ProductCategory } from '@product-category/entities/product-category.entity';
 import { Esco } from '@esco/entities/esco.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -17,7 +17,7 @@ export class CreateProductDto {
   name: string;
 
   @ApiProperty()
-  @MaxLength(300)
+  @MaxLength(500)
   description: string;
 
   @ApiProperty()

@@ -13,7 +13,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
-import { ImageFieldsInterceptor } from '@core/core.interceptors';
+import { PhotoUploadsInterceptor } from '@core/core.interceptors';
 import { Auth, GetUser, IsPublic } from '@auth/auth.decorators';
 import { Role } from '../role/role.constants';
 import { AllowOnly } from '../role/roles.decorators';
@@ -46,7 +46,7 @@ export class ProductController {
   }
 
   @ApiPaginationQuery(PRODUCT_PAGINATION_CONFIG)
-  @AllowOnly(Role.FARMER)
+  @AllowOnly(Role.ESCO, Role.FARMER)
   @Get('favorites')
   findFavoriteProducts(
     @GetUser() user: User,
@@ -84,6 +84,15 @@ export class ProductController {
   }
 
   @IsPublic()
+  @Get(':id/installations')
+  findProductInstallations(
+    @Param('id') id: string,
+    @Paginate() query: PaginateQuery,
+  ) {
+    return this.productService.findProductInstallations(+id, query);
+  }
+
+  @IsPublic()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
@@ -99,7 +108,7 @@ export class ProductController {
   @ApiBody({ type: UploadProductPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
-    ImageFieldsInterceptor([
+    PhotoUploadsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'photo1', maxCount: 1 },
       { name: 'photo2', maxCount: 1 },

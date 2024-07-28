@@ -34,6 +34,10 @@ export class Esco extends BaseEntity {
   @Column()
   phoneNumber: string;
 
+  // TODO: Remove nullable after all records have been updated to have an address. It has been done like this for now because existing records will raise errors for a non nullable field without a default
+  @Column({ nullable: true })
+  address: string;
+
   @Column()
   latitude: string;
 

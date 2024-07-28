@@ -6,15 +6,19 @@ import { Product } from '@product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
 import {
-  getFavoriteProductPaginationConfig,
+  getEscoFavoritedProductsPaginationConfig,
+  getFarmerFavoritedProductsPaginationConfig,
   PRODUCT_PAGINATION_CONFIG,
 } from '@product/product.pagination.config';
-import { ProductCategory } from '../product-category/entities/product-category.entity';
+import { ProductCategory } from '@product-category/entities/product-category.entity';
 import { Esco } from '@esco/entities/esco.entity';
 import { BaseService } from '@core/core.base';
 import { StorageService } from '@storage/storage.service';
 import { Resource } from '@core/core.constants';
 import { FavoriteProduct } from '@product/entities/favorite-product.entity';
+import { Installation } from '@installation/entities/installation.entity';
+import { getProductInstallationsPaginationConfig } from '@installation/installation.pagination.config';
+import { Role } from '@role/role.constants';
 
 @Injectable()
 export class ProductService extends BaseService {
@@ -22,6 +26,8 @@ export class ProductService extends BaseService {
     @InjectRepository(Product) private productRepository: Repository<Product>,
     @InjectRepository(FavoriteProduct)
     private favoriteProductRepository: Repository<FavoriteProduct>,
+    @InjectRepository(Installation)
+    private installationRepository: Repository<Installation>,
     private storageService: StorageService,
   ) {
     super();
@@ -36,7 +42,7 @@ export class ProductService extends BaseService {
       esco,
     });
     product.categories = this.fillMissingCategories(categoriesIds, categories);
-    return this.productRepository.save(product);
+    return Product.save(product);
   }
 
   private fillMissingCategories(
@@ -59,6 +65,14 @@ export class ProductService extends BaseService {
       query,
       this.productRepository,
       PRODUCT_PAGINATION_CONFIG,
+    );
+  }
+
+  async findProductInstallations(id: number, query: PaginateQuery) {
+    return await paginate(
+      query,
+      this.installationRepository,
+      getProductInstallationsPaginationConfig(id),
     );
   }
 
@@ -123,12 +137,23 @@ export class ProductService extends BaseService {
   }
 
   async findFavoriteProducts(query: PaginateQuery) {
-    const { id: farmerId } = this.user;
-    return await paginate(
-      query,
-      this.favoriteProductRepository,
-      getFavoriteProductPaginationConfig(farmerId),
-    );
+    const { id: userId, role: userRole } = this.user;
+    switch (userRole) {
+      case Role.ESCO:
+        return await paginate(
+          query,
+          this.favoriteProductRepository,
+          getEscoFavoritedProductsPaginationConfig(userId),
+        );
+      case Role.FARMER:
+        return await paginate(
+          query,
+          this.favoriteProductRepository,
+          getFarmerFavoritedProductsPaginationConfig(userId),
+        );
+      default:
+        throw new BadRequestException('Unknown user');
+    }
   }
 
   async favoriteProduct(id: number) {

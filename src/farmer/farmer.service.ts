@@ -21,7 +21,7 @@ export class FarmerService extends BaseService {
 
   async create(createFarmerDto: CreateFarmerDto) {
     const farmer = this.farmerRepository.create(createFarmerDto);
-    return await this.farmerRepository.save(farmer);
+    return await Farmer.save(farmer);
   }
 
   async findAll(query: PaginateQuery) {

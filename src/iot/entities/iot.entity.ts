@@ -1,8 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Installation } from '@installation/entities/installation.entity';
+import { Esco } from '@esco/entities/esco.entity';
 
 @Entity()
-export class Iot {
+export class Iot extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -12,6 +21,10 @@ export class Iot {
   @Column()
   accessToken: string;
 
-  @ManyToOne(() => Installation, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Esco)
+  esco: Esco;
+
+  @OneToOne(() => Installation, { onDelete: 'CASCADE' })
+  @JoinColumn()
   installation: Installation;
 }

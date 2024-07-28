@@ -13,7 +13,7 @@ import { FarmerService } from './farmer.service';
 import { CreateFarmerDto } from './dto/create-farmer.dto';
 import { UpdateFarmerDto } from './dto/update-farmer.dto';
 import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
-import { ImageFieldsInterceptor } from '@core/core.interceptors';
+import { PhotoUploadsInterceptor } from '@core/core.interceptors';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -60,7 +60,7 @@ export class FarmerController {
   @ApiBody({ type: UploadFarmerPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
-    ImageFieldsInterceptor([
+    PhotoUploadsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'profilePhoto', maxCount: 1 },
     ]),

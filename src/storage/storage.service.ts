@@ -40,7 +40,9 @@ export class StorageService {
 
   url(path: string) {
     if (path.startsWith(this.uploadDir)) {
-      return path.replace(this.uploadDir, this.uploadUrl);
+      return path
+        .replace(this.uploadDir, this.uploadUrl)
+        .replace(/\/{2,}/, '/');
     }
     return path;
   }

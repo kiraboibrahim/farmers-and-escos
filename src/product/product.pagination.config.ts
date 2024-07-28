@@ -17,7 +17,7 @@ export const getEscoProductsPaginationConfig = (escoId: number) => {
   return { ...PRODUCT_PAGINATION_CONFIG, where: { esco: { id: escoId } } };
 };
 
-export const getFavoriteProductPaginationConfig = (
+export const getFarmerFavoritedProductsPaginationConfig = (
   farmerId: number,
 ): PaginateConfig<FavoriteProduct> => {
   return {
@@ -28,5 +28,25 @@ export const getFavoriteProductPaginationConfig = (
     defaultLimit: MAX_ITEMS_PER_PAGE,
     paginationType: PaginationType.TAKE_AND_SKIP,
     loadEagerRelations: true,
+  };
+};
+
+export const getEscoFavoritedProductsPaginationConfig = (
+  escoId: number,
+): PaginateConfig<FavoriteProduct> => {
+  return {
+    sortableColumns: ['id'],
+    defaultSortBy: [['id', 'DESC']],
+    where: { product: { esco: { id: escoId } } },
+    maxLimit: 0,
+    defaultLimit: MAX_ITEMS_PER_PAGE,
+    paginationType: PaginationType.TAKE_AND_SKIP,
+    loadEagerRelations: false,
+    relations: {
+      farmer: true,
+      product: {
+        categories: true,
+      },
+    },
   };
 };

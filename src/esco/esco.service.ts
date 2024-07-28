@@ -24,7 +24,7 @@ export class EscoService extends BaseService {
 
   async create(createEscoDto: CreateEscoDto) {
     const esco = this.escoRepository.create(createEscoDto);
-    return await this.escoRepository.save(esco);
+    return await Esco.save(esco);
   }
 
   async findAll(query: PaginateQuery) {

@@ -17,6 +17,7 @@ export const MAX_ITEMS_PER_PAGE = 20;
 // File uploads
 export const MAX_FILE_SIZE = 2.5 * 1024 * 1024; // 2.5 MBs
 
+// Resource Names
 export enum Resource {
   ESCO = 'ESCO',
   FARMER = 'FARMER',
@@ -25,3 +26,6 @@ export enum Resource {
   IOT = 'IOT',
   OFFER = 'OFFER',
 }
+
+export const MIN_RATING = 0;
+export const MAX_RATING = 5;

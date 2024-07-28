@@ -9,7 +9,7 @@ import {
 import { hash } from '@core/core.utils';
 import { Exclude } from 'class-transformer';
 import * as argon2 from 'argon2';
-import { Role } from '../../role/role.constants';
+import { Role } from '@role/role.constants';
 
 @Entity()
 export class Farmer extends BaseEntity {
@@ -37,11 +37,19 @@ export class Farmer extends BaseEntity {
   @Column({ nullable: true })
   profilePhoto: string;
 
+  // TODO: Remove nullable after all records have been updated to have an address. It has been done like this for now because existing records will raise errors for a non nullable field without a default
+  @Column({ nullable: true })
+  farmName: string;
+
   @Column()
   farmDescription: string;
 
   @Column()
   farmSize: string;
+
+  // TODO: Remove nullable after all records have been updated to have an address. It has been done like this for now because existing records will raise errors for a non nullable field without a default
+  @Column({ nullable: true })
+  address: string;
 
   @Column()
   latitude: string;

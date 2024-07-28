@@ -6,6 +6,7 @@ import {
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
+  IsString,
 } from 'class-validator';
 import {
   IsStrongPassword,
@@ -38,6 +39,11 @@ export class CreateEscoDto {
   phoneNumber: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty()
   @IsLatitude()
   latitude: string;
 
@@ -55,9 +61,11 @@ export class CreateEscoDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
   registrationNumber: string;
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
   specialization: string;
 }

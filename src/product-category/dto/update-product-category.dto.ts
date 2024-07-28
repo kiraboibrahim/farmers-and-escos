@@ -1,8 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { CreateProductCategoryDto } from '@product-category/dto/create-product-category.dto';
 
-export class UpdateProductCategoryDto {
-  @ApiProperty()
-  @IsString()
-  name: string;
-}
+export class UpdateProductCategoryDto extends CreateProductCategoryDto {}

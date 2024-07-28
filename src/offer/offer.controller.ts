@@ -6,12 +6,23 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Auth, GetUser } from '@auth/auth.decorators';
+import { Role } from '@role/role.constants';
+import { User } from '@auth/auth.types';
+import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
+import { OFFER_PAGINATION_CONFIG } from '@offer/offer.pagination.config';
+import { AllowOnly, AlsoAllow } from '@role/roles.decorators';
+import { UploadOfferInvoiceDtoDto } from '@offer/dto/upload-offer-invoice.dto';
+import { PDFUploadInterceptor } from '@core/core.interceptors';
 
+@Auth(Role.SUPER_USER, Role.ESCO)
 @ApiTags('Offers')
 @Controller('offers')
 export class OfferController {
@@ -22,14 +33,35 @@ export class OfferController {
     return this.offerService.create(createOfferDto);
   }
 
+  @ApiPaginationQuery(OFFER_PAGINATION_CONFIG)
+  @AlsoAllow(Role.FARMER)
   @Get()
-  findAll() {
-    return this.offerService.findAll();
+  findAll(@GetUser() user: User, @Paginate() query: PaginateQuery) {
+    this.offerService.setUser(user);
+    return this.offerService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.offerService.findOne(+id);
+  }
+
+  @AllowOnly(Role.FARMER)
+  @Patch(':id/accepts')
+  acceptOffer(@Param('id') id: string, @GetUser() user: User) {
+    this.offerService.setUser(user);
+    return this.offerService.acceptOffer(+id);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UploadOfferInvoiceDtoDto })
+  @UseInterceptors(PDFUploadInterceptor('invoice'))
+  @Patch(':id/invoices')
+  uploadInvoice(
+    @Param('id') id: string,
+    @UploadedFile() invoice: Express.Multer.File,
+  ) {
+    return this.offerService.uploadInvoice(+id, invoice);
   }
 
   @Patch(':id')

@@ -1,26 +1,176 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInstallationDto } from './dto/create-installation.dto';
 import { UpdateInstallationDto } from './dto/update-installation.dto';
+import { BaseService } from '@core/core.base';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Installation } from '@installation/entities/installation.entity';
+import { Repository } from 'typeorm';
+import { Product } from '@product/entities/product.entity';
+import { Farmer } from '@farmer/entities/farmer.entity';
+import { Esco } from '@esco/entities/esco.entity';
+import { Role } from '@role/role.constants';
+import { paginate, PaginateQuery } from 'nestjs-paginate';
+import {
+  getEscoInstallationsPaginationConfig,
+  getFarmerInstallationsPaginationConfig,
+  INSTALLATION_PAGINATION_CONFIG,
+} from '@installation/installation.pagination.config';
+import { Resource } from '@core/core.constants';
+import { StorageService } from '@storage/storage.service';
+import { CreateInstallationReviewDto } from '@installation/dto/create-installation-review.dto';
+import { InstallationReview } from '@installation/entities/installation-review.entity';
+import { UpdateInstallationReviewDto } from '@installation/dto/update-installation-review.dto';
 
 @Injectable()
-export class InstallationService {
-  create(createInstallationDto: CreateInstallationDto) {
-    return 'This action adds a new installation';
+export class InstallationService extends BaseService {
+  constructor(
+    @InjectRepository(Installation)
+    private installationRepository: Repository<Installation>,
+    @InjectRepository(InstallationReview)
+    private installationReviewRepository: Repository<InstallationReview>,
+    private storageService: StorageService,
+  ) {
+    super();
   }
 
-  findAll() {
-    return `This action returns all installation`;
+  async create(createInstallationDto: CreateInstallationDto) {
+    const {
+      product,
+      farmer,
+      esco,
+    }: { product: Product; farmer: Farmer; esco: Esco } =
+      createInstallationDto as any;
+    const installation = this.installationRepository.create({
+      ...createInstallationDto,
+      product,
+      farmer,
+      esco,
+    });
+    return Installation.save(installation);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} installation`;
+  async createInstallationReview(
+    id: number,
+    createInstallationReviewDto: CreateInstallationReviewDto,
+  ) {
+    const { id: farmerId } = this.user;
+    const farmer = await Farmer.preload({ id: farmerId });
+    const installation = await Installation.preload({
+      id,
+      farmer: { id: farmerId },
+    });
+    if (!installation.canBeReviewed(farmerId)) {
+      throw new BadRequestException(
+        'Installation confirmation is still pending or is already reviewed',
+      );
+    }
+    const installationReview = this.installationReviewRepository.create({
+      ...createInstallationReviewDto,
+      installation,
+      farmer,
+    });
+    return await InstallationReview.save(installationReview);
   }
 
-  update(id: number, updateInstallationDto: UpdateInstallationDto) {
-    return `This action updates a #${id} installation`;
+  async findAll(query: PaginateQuery) {
+    const { id: userId, role: userRole } = this.user;
+
+    switch (userRole) {
+      case Role.SUPER_USER:
+        return await paginate(
+          query,
+          this.installationRepository,
+          INSTALLATION_PAGINATION_CONFIG,
+        );
+      case Role.ESCO:
+        return await paginate(
+          query,
+          this.installationRepository,
+          getEscoInstallationsPaginationConfig(userId),
+        );
+      case Role.FARMER:
+        return await paginate(
+          query,
+          this.installationRepository,
+          getFarmerInstallationsPaginationConfig(userId),
+        );
+      default:
+        throw new BadRequestException('Invalid Role');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} installation`;
+  async findInstallationReviews(id: number) {
+    return await InstallationReview.findBy({ installation: { id } });
+  }
+
+  async findOne(id: number) {
+    const { id: userId, role: userRole } = this.user;
+    switch (userRole) {
+      case Role.SUPER_USER:
+        return await Installation.findOneBy({ id });
+      case Role.ESCO:
+        return await Installation.findOneBy({ id, esco: { id: userId } });
+      case Role.FARMER:
+        return await Installation.findOneBy({ id, farmer: { id: userId } });
+      default:
+        throw new BadRequestException('Invalid Role');
+    }
+  }
+
+  async updateInstallationReview(
+    id: number,
+    updateInstallationReviewDto: UpdateInstallationReviewDto,
+  ) {
+    const { id: farmerId } = this.user;
+    this.handleMissingUpdateValues(updateInstallationReviewDto);
+    return await InstallationReview.update(
+      { id, farmer: { id: farmerId } },
+      updateInstallationReviewDto,
+    );
+  }
+
+  async uploadPhotos(
+    id: number,
+    { coverPhoto, photo1, photo2, photo3, photo4 },
+  ) {
+    const [coverPhotoUrl, photo1Url, photo2Url, photo3Url, photo4Url] =
+      await this.storageService.uploadBatch(
+        [coverPhoto, photo1, photo2, photo3, photo4],
+        Resource.INSTALLATION,
+        id,
+      );
+    const installationPhotoUploadDto = {
+      coverPhoto: coverPhotoUrl,
+      photo1: photo1Url,
+      photo2: photo2Url,
+      photo3: photo3Url,
+      photo4: photo4Url,
+    };
+    this.handleMissingUpdateValues(installationPhotoUploadDto);
+    return await Installation.update({ id }, installationPhotoUploadDto);
+  }
+
+  async confirmInstallation(id: number) {
+    const { id: farmerId } = this.user;
+    return await Installation.update(
+      { id, farmer: { id: farmerId } },
+      { isConfirmed: true },
+    );
+  }
+
+  async update(id: number, updateInstallationDto: UpdateInstallationDto) {
+    const { product, farmer }: { product: Product; farmer: Farmer } =
+      updateInstallationDto as any;
+    const _updateInstallationDto = {
+      ...updateInstallationDto,
+      product,
+      farmer,
+    };
+    this.handleMissingUpdateValues(_updateInstallationDto);
+    return await Installation.update({ id }, _updateInstallationDto);
+  }
+
+  async remove(id: number) {
+    return await this.installationRepository.delete({ id });
   }
 }
