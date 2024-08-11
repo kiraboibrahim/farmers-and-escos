@@ -9,7 +9,7 @@ import {
 import { hash } from '@core/core.utils';
 import { Exclude } from 'class-transformer';
 import * as argon2 from 'argon2';
-import { Role } from '../../role/role.constants';
+import { Role } from '@role/role.constants';
 
 @Entity()
 export class Esco extends BaseEntity {

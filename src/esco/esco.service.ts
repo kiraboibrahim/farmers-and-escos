@@ -11,6 +11,8 @@ import { Resource } from '@core/core.constants';
 import { BaseService } from '@core/core.base';
 import { Product } from '@product/entities/product.entity';
 import { getEscoProductsPaginationConfig } from '@product/product.pagination.config';
+import { Installation } from '@installation/entities/installation.entity';
+import { getEscoInstallationsPaginationConfig } from '@installation/installation.pagination.config';
 
 @Injectable()
 export class EscoService extends BaseService {
@@ -18,6 +20,8 @@ export class EscoService extends BaseService {
     private storageService: StorageService,
     @InjectRepository(Esco) private escoRepository: Repository<Esco>,
     @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectRepository(Installation)
+    private installationRepository: Repository<Installation>,
   ) {
     super();
   }
@@ -29,6 +33,14 @@ export class EscoService extends BaseService {
 
   async findAll(query: PaginateQuery) {
     return await paginate(query, this.escoRepository, ESCO_PAGINATION_CONFIG);
+  }
+
+  async findEscoInstallations(escoId: number, query: PaginateQuery) {
+    return await paginate(
+      query,
+      this.installationRepository,
+      getEscoInstallationsPaginationConfig(escoId),
+    );
   }
 
   async findOne(id: number) {

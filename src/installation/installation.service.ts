@@ -8,18 +8,13 @@ import { Repository } from 'typeorm';
 import { Product } from '@product/entities/product.entity';
 import { Farmer } from '@farmer/entities/farmer.entity';
 import { Esco } from '@esco/entities/esco.entity';
-import { Role } from '@role/role.constants';
-import { paginate, PaginateQuery } from 'nestjs-paginate';
-import {
-  getEscoInstallationsPaginationConfig,
-  getFarmerInstallationsPaginationConfig,
-  INSTALLATION_PAGINATION_CONFIG,
-} from '@installation/installation.pagination.config';
 import { Resource } from '@core/core.constants';
 import { StorageService } from '@storage/storage.service';
 import { CreateInstallationReviewDto } from '@installation/dto/create-installation-review.dto';
 import { InstallationReview } from '@installation/entities/installation-review.entity';
 import { UpdateInstallationReviewDto } from '@installation/dto/update-installation-review.dto';
+import { paginate, PaginateQuery } from 'nestjs-paginate';
+import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
 
 @Injectable()
 export class InstallationService extends BaseService {
@@ -73,48 +68,21 @@ export class InstallationService extends BaseService {
   }
 
   async findAll(query: PaginateQuery) {
-    const { id: userId, role: userRole } = this.user;
-
-    switch (userRole) {
-      case Role.SUPER_USER:
-        return await paginate(
-          query,
-          this.installationRepository,
-          INSTALLATION_PAGINATION_CONFIG,
-        );
-      case Role.ESCO:
-        return await paginate(
-          query,
-          this.installationRepository,
-          getEscoInstallationsPaginationConfig(userId),
-        );
-      case Role.FARMER:
-        return await paginate(
-          query,
-          this.installationRepository,
-          getFarmerInstallationsPaginationConfig(userId),
-        );
-      default:
-        throw new BadRequestException('Invalid Role');
-    }
+    return await paginate(
+      query,
+      this.installationRepository,
+      INSTALLATION_PAGINATION_CONFIG,
+    );
   }
 
-  async findInstallationReviews(id: number) {
-    return await InstallationReview.findBy({ installation: { id } });
+  async findInstallationReviews(installationId: number) {
+    return await InstallationReview.findBy({
+      installation: { id: installationId },
+    });
   }
 
   async findOne(id: number) {
-    const { id: userId, role: userRole } = this.user;
-    switch (userRole) {
-      case Role.SUPER_USER:
-        return await Installation.findOneBy({ id });
-      case Role.ESCO:
-        return await Installation.findOneBy({ id, esco: { id: userId } });
-      case Role.FARMER:
-        return await Installation.findOneBy({ id, farmer: { id: userId } });
-      default:
-        throw new BadRequestException('Invalid Role');
-    }
+    return await Installation.findOneBy({ id });
   }
 
   async updateInstallationReview(

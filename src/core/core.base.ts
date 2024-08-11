@@ -1,6 +1,7 @@
-import { isEmpty } from '@core/core.utils';
+import { getNow, isEmpty } from '@core/core.utils';
 import { BadRequestException } from '@nestjs/common';
 import { User } from '@auth/auth.types';
+import { BaseEntity, BeforeInsert, Column } from 'typeorm';
 
 export class BaseService {
   private _user: User;
@@ -19,5 +20,15 @@ export class BaseService {
 
   handleMissingUpdateValues(dto: any) {
     if (isEmpty(dto)) throw new BadRequestException('Missing update values');
+  }
+}
+
+export abstract class AutoCreatedDateTime extends BaseEntity {
+  @Column({ type: 'timestamp with time zone', default: getNow() })
+  createdAt: string;
+
+  @BeforeInsert()
+  setCreatedAt() {
+    this.createdAt = getNow();
   }
 }

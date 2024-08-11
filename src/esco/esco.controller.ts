@@ -13,7 +13,7 @@ import { EscoService } from './esco.service';
 import { CreateEscoDto } from './dto/create-esco.dto';
 import { UpdateEscoDto } from './dto/update-esco.dto';
 import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
-import { PhotoUploadsInterceptor } from '@core/core.interceptors';
+import { PhotoFieldsInterceptor } from '@core/core.interceptors';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -25,6 +25,7 @@ import {
 import { ESCO_PAGINATION_CONFIG } from '@esco/esco.pagination.config';
 import { UploadEscoPhotosDto } from '@esco/dto/upload-esco-photos.dto';
 import { PRODUCT_PAGINATION_CONFIG } from '@product/product.pagination.config';
+import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
 
 @ApiTags('Escos')
 @Controller('escos')
@@ -46,6 +47,15 @@ export class EscoController {
     return this.escoService.findAll(query);
   }
 
+  @ApiPaginationQuery(INSTALLATION_PAGINATION_CONFIG)
+  @Get(':id/installations')
+  findEscoInstallations(
+    @Param('id') id: string,
+    @Paginate() query: PaginateQuery,
+  ) {
+    return this.escoService.findEscoInstallations(+id, query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.escoService.findOne(+id);
@@ -65,7 +75,7 @@ export class EscoController {
   @ApiBody({ type: UploadEscoPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
-    PhotoUploadsInterceptor([
+    PhotoFieldsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'profilePhoto', maxCount: 1 },
     ]),

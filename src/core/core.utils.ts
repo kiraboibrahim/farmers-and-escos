@@ -4,6 +4,9 @@ import {
   LYCA_UG_REGEX,
   MTN_UG_REGEX,
 } from '@core/core.constants';
+import { DateTimeFormatter, ZonedDateTime, ZoneId } from '@js-joda/core';
+
+require('@js-joda/timezone');
 
 export const applyMixins = (
   derivedConstructor: any,
@@ -35,4 +38,10 @@ export const isEmpty = (obj: any) => {
     }
   }
   return true;
+};
+
+export const getNow = () => {
+  const timezone = process.env.TZ;
+  const now = ZonedDateTime.now(ZoneId.of(timezone));
+  return now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 };

@@ -13,7 +13,7 @@ import { FarmerService } from './farmer.service';
 import { CreateFarmerDto } from './dto/create-farmer.dto';
 import { UpdateFarmerDto } from './dto/update-farmer.dto';
 import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
-import { PhotoUploadsInterceptor } from '@core/core.interceptors';
+import { PhotoFieldsInterceptor } from '@core/core.interceptors';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { FARMER_PAGINATION_CONFIG } from '@farmer/farmer.pagination.config';
 import { UploadFarmerPhotosDto } from '@farmer/dto/upload-farmer-photos.dto';
+import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
 
 @ApiTags('Farmers')
 @Controller('farmers')
@@ -45,6 +46,15 @@ export class FarmerController {
     return this.farmerService.findAll(query);
   }
 
+  @ApiPaginationQuery(INSTALLATION_PAGINATION_CONFIG)
+  @Get(':id/installations')
+  findFarmerInstallations(
+    @Param('id') id: string,
+    @Paginate() query: PaginateQuery,
+  ) {
+    return this.farmerService.findFarmerInstallations(+id, query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.farmerService.findOne(+id);
@@ -60,7 +70,7 @@ export class FarmerController {
   @ApiBody({ type: UploadFarmerPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
-    PhotoUploadsInterceptor([
+    PhotoFieldsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'profilePhoto', maxCount: 1 },
     ]),

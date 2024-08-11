@@ -1,6 +1,4 @@
 import {
-  BaseEntity,
-  BeforeInsert,
   Column,
   Entity,
   ManyToOne,
@@ -11,12 +9,10 @@ import { Product } from '@product/entities/product.entity';
 import { Iot } from '@iot/entities/iot.entity';
 import { Esco } from '@esco/entities/esco.entity';
 import { Farmer } from '@farmer/entities/farmer.entity';
-import { DateTimeFormatter, ZonedDateTime, ZoneId } from '@js-joda/core';
-
-require('@js-joda/timezone');
+import { AutoCreatedDateTime } from '@core/core.base';
 
 @Entity()
-export class Installation extends BaseEntity {
+export class Installation extends AutoCreatedDateTime {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,9 +24,6 @@ export class Installation extends BaseEntity {
 
   @Column()
   longitude: string;
-
-  @Column({ type: 'timestamp' })
-  createdAt: string;
 
   @Column({ type: 'boolean', default: false })
   isReviewed: boolean;
@@ -66,13 +59,6 @@ export class Installation extends BaseEntity {
     cascade: ['insert'],
   })
   IOT: Iot;
-
-  @BeforeInsert()
-  setCreatedAt() {
-    const timezone = process.env.TZ;
-    const now = ZonedDateTime.now(ZoneId.of(timezone));
-    this.createdAt = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-  }
 
   isForFarmer(farmerId: number) {
     return this.farmer.id === farmerId;

@@ -4,6 +4,10 @@ import { INestApplication, VersioningType } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { VERSION } from '@core/core.constants';
+
+// Load IANA timezone names
+require('@js-joda/timezone');
 
 declare const module: any;
 
@@ -26,7 +30,7 @@ async function bootstrap() {
 function setupVersioning(app: INestApplication) {
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '0.1.0',
+    defaultVersion: VERSION,
   });
 }
 
@@ -39,12 +43,13 @@ function setupCrossOrigin(app: INestApplication) {
 }
 
 function setupSwagger(app: INestApplication) {
-  const TITLE = 'Farmers and ESCOs Backend';
-  const VERSION = '1.0.0';
+  const TITLE = 'Farmers and ESCOs API';
+  const DESCRIPTION =
+    'A system that bridges the gap between farmers and energy service companies. Agricultural services are just one click away from the farmer';
   const SWAGGER_URI = 'docs';
   const documentConfig = new DocumentBuilder()
     .setTitle(TITLE)
-    .setDescription(TITLE)
+    .setDescription(DESCRIPTION)
     .setVersion(VERSION)
     .addBearerAuth()
     .build();

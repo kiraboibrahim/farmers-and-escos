@@ -8,7 +8,7 @@ import { Offer } from '@offer/entities/offer.entity';
 
 export const OFFER_PAGINATION_CONFIG: PaginateConfig<Offer> = {
   sortableColumns: ['id'],
-  defaultSortBy: [['id', 'DESC']],
+  defaultSortBy: [['createdAt', 'DESC']],
   searchableColumns: ['description'],
   filterableColumns: { isAccepted: [FilterOperator.EQ] },
   maxLimit: 0,

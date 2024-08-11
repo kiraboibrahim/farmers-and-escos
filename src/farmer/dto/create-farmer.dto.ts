@@ -1,5 +1,6 @@
 import {
   IsAlpha,
+  IsISO8601,
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
@@ -7,8 +8,9 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { IsStrongPIN, IsUGPhoneNumber } from '@core/core.validators';
+import { IsStrongPIN, IsUGPhoneNumber, IsUnique } from '@core/core.validators';
 import { ApiProperty } from '@nestjs/swagger';
+import { Farmer } from '@farmer/entities/farmer.entity';
 
 export class CreateFarmerDto {
   @ApiProperty()
@@ -21,6 +23,7 @@ export class CreateFarmerDto {
 
   @ApiProperty()
   @IsUGPhoneNumber()
+  @IsUnique<Farmer>({ entityClass: Farmer, findByColumnName: 'phoneNumber' })
   phoneNumber: string;
 
   @ApiProperty()
@@ -41,6 +44,30 @@ export class CreateFarmerDto {
   @ApiProperty()
   @IsNumberString()
   farmSize: string;
+
+  @ApiProperty()
+  @IsISO8601()
+  farmEstablishedOn: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  cropsGrown: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  acreagePerCrop: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  animalsKept: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  animalsPerType: string;
 
   @ApiProperty()
   @IsString()

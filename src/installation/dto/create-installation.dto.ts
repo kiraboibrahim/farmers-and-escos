@@ -14,7 +14,7 @@ import { Product } from '@product/entities/product.entity';
 import { Esco } from '@esco/entities/esco.entity';
 import { Farmer } from '@farmer/entities/farmer.entity';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 export class CreateInstallationDto {
   @ApiProperty()
@@ -35,6 +35,7 @@ export class CreateInstallationDto {
   productId: number;
 
   @ApiProperty()
+  @IsOptional()
   @LoadEntity({ entityClass: Farmer, accessEntityByProperty: 'farmer' })
   @IsInt()
   farmerId: number;
@@ -44,8 +45,9 @@ export class CreateInstallationDto {
   @IsInt()
   escoId: number;
 
+  // IOT will be automatically assigned the installationId of the newly created one(CASCADE option in Installment entity)
   @ApiProperty()
-  @Type(() => CreateIotDto)
+  @Type(() => OmitType(CreateIotDto, ['installationId']))
   @ValidateNested()
   @IsOptional()
   IOT: CreateIotDto;

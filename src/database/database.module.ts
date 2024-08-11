@@ -10,6 +10,7 @@ import { Offer } from '@offer/entities/offer.entity';
 import { Product } from '@product/entities/product.entity';
 import { ProductCategory } from '@product-category/entities/product-category.entity';
 import { FavoriteProduct } from '@product/entities/favorite-product.entity';
+import { GalleryPhoto } from '../gallery/entities/gallery-photo.entity';
 
 const ENTITIES = [
   Esco,
@@ -21,6 +22,7 @@ const ENTITIES = [
   Product,
   ProductCategory,
   FavoriteProduct,
+  GalleryPhoto,
 ];
 
 @Module({

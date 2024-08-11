@@ -15,7 +15,7 @@ export const MIN_UPPERCASE_IN_PASSWORD = 4;
 export const MAX_ITEMS_PER_PAGE = 20;
 
 // File uploads
-export const MAX_FILE_SIZE = 2.5 * 1024 * 1024; // 2.5 MBs
+export const MAX_PHOTO_SIZE = 2.5 * 1024 * 1024; // 2.5 MBs
 
 // Resource Names
 export enum Resource {
@@ -29,3 +29,8 @@ export enum Resource {
 
 export const MIN_RATING = 0;
 export const MAX_RATING = 5;
+
+export const MAX_GALLERY_PHOTOS_PER_FARMER = 10;
+export const MAX_GALLERY_PHOTOS_PER_UPLOAD = 3;
+
+export const VERSION = '0.1.0';

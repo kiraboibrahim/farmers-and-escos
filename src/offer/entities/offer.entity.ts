@@ -1,20 +1,12 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Esco } from '@esco/entities/esco.entity';
 import { Farmer } from '@farmer/entities/farmer.entity';
 import { Product } from '@product/entities/product.entity';
 import { LocalDate, ZoneId } from '@js-joda/core';
-import * as process from 'node:process';
-
-require('@js-joda/timezone');
+import { AutoCreatedDateTime } from '@core/core.base';
 
 @Entity()
-export class Offer extends BaseEntity {
+export class Offer extends AutoCreatedDateTime {
   @PrimaryGeneratedColumn()
   id: number;
 

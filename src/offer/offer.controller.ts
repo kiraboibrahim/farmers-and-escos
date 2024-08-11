@@ -20,7 +20,7 @@ import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
 import { OFFER_PAGINATION_CONFIG } from '@offer/offer.pagination.config';
 import { AllowOnly, AlsoAllow } from '@role/roles.decorators';
 import { UploadOfferInvoiceDtoDto } from '@offer/dto/upload-offer-invoice.dto';
-import { PDFUploadInterceptor } from '@core/core.interceptors';
+import { PDFFieldInterceptor } from '@core/core.interceptors';
 
 @Auth(Role.SUPER_USER, Role.ESCO)
 @ApiTags('Offers')
@@ -55,7 +55,7 @@ export class OfferController {
 
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadOfferInvoiceDtoDto })
-  @UseInterceptors(PDFUploadInterceptor('invoice'))
+  @UseInterceptors(PDFFieldInterceptor('invoice'))
   @Patch(':id/invoices')
   uploadInvoice(
     @Param('id') id: string,

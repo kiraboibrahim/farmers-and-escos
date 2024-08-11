@@ -17,6 +17,7 @@ import { DatabaseModule } from '@database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ProductCategoryModule } from './product-category/product-category.module';
+import { GalleryModule } from './gallery/gallery.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ProductCategoryModule } from './product-category/product-category.modul
       expandVariables: true,
     }),
     ProductCategoryModule,
+    GalleryModule,
   ],
   controllers: [AppController],
   providers: [

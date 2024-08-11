@@ -1,7 +1,5 @@
-import { ProductCategory } from '../../product-category/entities/product-category.entity';
+import { ProductCategory } from '@product-category/entities/product-category.entity';
 import {
-  BaseEntity,
-  BeforeInsert,
   Column,
   Entity,
   JoinTable,
@@ -10,12 +8,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Esco } from '@esco/entities/esco.entity';
-import { DateTimeFormatter, ZonedDateTime, ZoneId } from '@js-joda/core';
-
-require('@js-joda/timezone');
+import { AutoCreatedDateTime } from '@core/core.base';
 
 @Entity()
-export class Product extends BaseEntity {
+export class Product extends AutoCreatedDateTime {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -25,14 +21,8 @@ export class Product extends BaseEntity {
   @Column()
   description: string;
 
-  @Column({ nullable: true })
-  price: number;
-
   @Column({ default: false })
   isFeatured: boolean;
-
-  @Column({ type: 'timestamp' })
-  createdAt: string;
 
   @Column({ nullable: true })
   coverPhoto: string;
@@ -58,11 +48,4 @@ export class Product extends BaseEntity {
 
   @ManyToOne(() => Esco, { eager: true, onDelete: 'CASCADE' })
   esco: Esco;
-
-  @BeforeInsert()
-  setCreatedAt() {
-    const timezone = process.env.TZ;
-    const now = ZonedDateTime.now(ZoneId.of(timezone));
-    this.createdAt = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-  }
 }

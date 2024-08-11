@@ -9,11 +9,15 @@ import { FARMER_PAGINATION_CONFIG } from '@farmer/farmer.pagination.config';
 import { Resource } from '@core/core.constants';
 import { StorageService } from '@storage/storage.service';
 import { BaseService } from '@core/core.base';
+import { Installation } from '@installation/entities/installation.entity';
+import { getFarmerInstallationsPaginationConfig } from '@installation/installation.pagination.config';
 
 @Injectable()
 export class FarmerService extends BaseService {
   constructor(
     @InjectRepository(Farmer) private farmerRepository: Repository<Farmer>,
+    @InjectRepository(Installation)
+    private installationRepository: Repository<Installation>,
     private storageService: StorageService,
   ) {
     super();
@@ -32,8 +36,16 @@ export class FarmerService extends BaseService {
     );
   }
 
+  async findFarmerInstallations(farmerId: number, query: PaginateQuery) {
+    return await paginate(
+      query,
+      this.installationRepository,
+      getFarmerInstallationsPaginationConfig(farmerId),
+    );
+  }
+
   async findOne(id: number) {
-    return await Farmer.findOneBy({ id });
+    return await Farmer.findOne({ where: { id }, relations: { photos: true } });
   }
 
   async update(id: number, updateFarmerDto: UpdateFarmerDto) {

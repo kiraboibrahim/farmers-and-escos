@@ -19,17 +19,17 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { PhotoUploadsInterceptor } from '@core/core.interceptors';
+import { PhotoFieldsInterceptor } from '@core/core.interceptors';
 import { UploadInstallationPhotosDto } from '@installation/dto/upload-installation-photos.dto';
-import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
-import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
-import { Auth, GetUser } from '@auth/auth.decorators';
+import { Auth, GetUser, IsPublic } from '@auth/auth.decorators';
 import { Role } from '@role/role.constants';
-import { AllowOnly, AlsoAllow } from '@role/roles.decorators';
+import { AllowOnly } from '@role/roles.decorators';
 import { User } from '@auth/auth.types';
 import { CreateInstallationReviewDto } from '@installation/dto/create-installation-review.dto';
 import { UpdateInstallationReviewDto } from '@installation/dto/update-installation-review.dto';
 import { InstallationExists } from '@installation/installation.validators';
+import { ApiPaginationQuery, Paginate, PaginateQuery } from 'nestjs-paginate';
+import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
 
 @Auth(Role.SUPER_USER, Role.ESCO)
 @ApiTags('Installations')
@@ -57,22 +57,21 @@ export class InstallationController {
   }
 
   @ApiPaginationQuery(INSTALLATION_PAGINATION_CONFIG)
-  @AlsoAllow(Role.FARMER)
+  @IsPublic()
   @Get()
-  findAll(@Paginate() query: PaginateQuery, @GetUser() user: User) {
-    this.installationService.setUser(user);
+  findAll(@Paginate() query: PaginateQuery) {
     return this.installationService.findAll(query);
   }
 
+  @IsPublic()
   @Get(':id/reviews')
   findInstallationReviews(@Param('id') id: string) {
     return this.installationService.findInstallationReviews(+id);
   }
 
-  @AlsoAllow(Role.FARMER)
+  @IsPublic()
   @Get(':id')
-  findOne(@Param('id') id: string, @GetUser() user: User) {
-    this.installationService.setUser(user);
+  findOne(@Param('id') id: string) {
     return this.installationService.findOne(+id);
   }
 
@@ -100,7 +99,7 @@ export class InstallationController {
   @ApiBody({ type: UploadInstallationPhotosDto })
   @Patch(':id/photos')
   @UseInterceptors(
-    PhotoUploadsInterceptor([
+    PhotoFieldsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'photo1', maxCount: 1 },
       { name: 'photo2', maxCount: 1 },
