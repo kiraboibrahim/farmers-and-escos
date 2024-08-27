@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInstallationDto } from './dto/create-installation.dto';
-import { UpdateInstallationDto } from './dto/update-installation.dto';
+import {
+  AcceptOrRejectInstallationDto,
+  UpdateInstallationDto,
+} from './dto/update-installation.dto';
 import { BaseService } from '@core/core.base';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Installation } from '@installation/entities/installation.entity';
@@ -81,6 +84,14 @@ export class InstallationService extends BaseService {
     });
   }
 
+  async findInstallationPerformance(installationId: number) {
+    const installation = await Installation.findOneOrFail({
+      where: { id: installationId },
+      relations: { IOT: true },
+    });
+    return installation.getIOTData();
+  }
+
   async findOne(id: number) {
     return await Installation.findOneBy({ id });
   }
@@ -118,12 +129,14 @@ export class InstallationService extends BaseService {
     return await Installation.update({ id }, installationPhotoUploadDto);
   }
 
-  async confirmInstallation(id: number) {
+  async acceptOrRejectInstallation(
+    installationId: number,
+    { isAccepted }: AcceptOrRejectInstallationDto,
+  ) {
     const { id: farmerId } = this.user;
-    return await Installation.update(
-      { id, farmer: { id: farmerId } },
-      { isConfirmed: true },
-    );
+    isAccepted
+      ? await Installation.acceptInstallation(installationId, farmerId)
+      : await Installation.rejectInstallation(installationId, farmerId);
   }
 
   async update(id: number, updateInstallationDto: UpdateInstallationDto) {

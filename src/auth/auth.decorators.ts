@@ -12,6 +12,7 @@ import { AllowOnly } from '@role/roles.decorators';
 import { PermissionGuard } from '../permission/permission.guard';
 import { RoleGuard } from '@role/role.guard';
 import { IS_PUBLIC } from '@auth/auth.constants';
+import { IPAddressGuard } from '@auth/ip.guard';
 
 export const Auth = (...roles: Role[]) => {
   return applyDecorators(
@@ -30,4 +31,12 @@ export const GetUser = createParamDecorator(
 
 export const IsPublic = () => {
   return SetMetadata(IS_PUBLIC, true);
+};
+
+export const AllowIPAddress = (IPAddress: string) => {
+  return UseGuards(new IPAddressGuard(IPAddress));
+};
+
+export const AllowLocalhost = () => {
+  return AllowIPAddress('127.0.0.1');
 };

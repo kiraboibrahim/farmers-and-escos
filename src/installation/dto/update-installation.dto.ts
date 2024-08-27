@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
 import { CreateInstallationDto } from './create-installation.dto';
-import { Equals, IsOptional } from 'class-validator';
+import { Equals, IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateInstallationDto extends PartialType(
   OmitType(CreateInstallationDto, ['escoId', 'IOT']),
@@ -52,4 +52,9 @@ export class UpdateInstallationDto extends PartialType(
   @Equals(null)
   @IsOptional()
   photo4: any;
+}
+
+export class AcceptOrRejectInstallationDto {
+  @IsBoolean()
+  isAccepted: boolean;
 }

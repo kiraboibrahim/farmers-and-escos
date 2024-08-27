@@ -17,7 +17,7 @@ export const getEscoProductsPaginationConfig = (escoId: number) => {
   return { ...PRODUCT_PAGINATION_CONFIG, where: { esco: { id: escoId } } };
 };
 
-export const getFarmerFavoritedProductsPaginationConfig = (
+export const getFarmerFavoriteProductsPaginationConfig = (
   farmerId: number,
 ): PaginateConfig<FavoriteProduct> => {
   return {
@@ -31,7 +31,7 @@ export const getFarmerFavoritedProductsPaginationConfig = (
   };
 };
 
-export const getEscoFavoritedProductsPaginationConfig = (
+export const getEscoFavoriteProductsPaginationConfig = (
   escoId: number,
 ): PaginateConfig<FavoriteProduct> => {
   return {

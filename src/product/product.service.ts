@@ -6,8 +6,8 @@ import { Product } from '@product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
 import {
-  getEscoFavoritedProductsPaginationConfig,
-  getFarmerFavoritedProductsPaginationConfig,
+  getEscoFavoriteProductsPaginationConfig,
+  getFarmerFavoriteProductsPaginationConfig,
   PRODUCT_PAGINATION_CONFIG,
 } from '@product/product.pagination.config';
 import { ProductCategory } from '@product-category/entities/product-category.entity';
@@ -58,6 +58,10 @@ export class ProductService extends BaseService {
       }
       return foundCategory;
     });
+  }
+
+  async findRecommendations() {
+    return await Product.find({ take: 10, skip: 0 });
   }
 
   async findAll(query: PaginateQuery) {
@@ -143,13 +147,13 @@ export class ProductService extends BaseService {
         return await paginate(
           query,
           this.favoriteProductRepository,
-          getEscoFavoritedProductsPaginationConfig(userId),
+          getEscoFavoriteProductsPaginationConfig(userId),
         );
       case Role.FARMER:
         return await paginate(
           query,
           this.favoriteProductRepository,
-          getFarmerFavoritedProductsPaginationConfig(userId),
+          getFarmerFavoriteProductsPaginationConfig(userId),
         );
       default:
         throw new BadRequestException('Unknown user');

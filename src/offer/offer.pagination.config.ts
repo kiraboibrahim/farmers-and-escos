@@ -10,7 +10,7 @@ export const OFFER_PAGINATION_CONFIG: PaginateConfig<Offer> = {
   sortableColumns: ['id'],
   defaultSortBy: [['createdAt', 'DESC']],
   searchableColumns: ['description'],
-  filterableColumns: { isAccepted: [FilterOperator.EQ] },
+  filterableColumns: { isAccepted: [FilterOperator.EQ, FilterOperator.NULL] },
   maxLimit: 0,
   defaultLimit: MAX_ITEMS_PER_PAGE,
   paginationType: PaginationType.TAKE_AND_SKIP,

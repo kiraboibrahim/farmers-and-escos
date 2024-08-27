@@ -11,7 +11,7 @@ export const INSTALLATION_PAGINATION_CONFIG: PaginateConfig<Installation> = {
   defaultSortBy: [['createdAt', 'DESC']],
   searchableColumns: ['description'],
   filterableColumns: {
-    isConfirmed: [FilterOperator.EQ],
+    isAccepted: [FilterOperator.EQ, FilterOperator.NULL],
     isReviewed: [FilterOperator.EQ],
   },
   maxLimit: 0,
@@ -32,7 +32,7 @@ export const getEscoInstallationsPaginationConfig = (escoId: number) => {
   return {
     ...INSTALLATION_PAGINATION_CONFIG,
     where: { esco: { id: escoId } },
-    relations: { product: true, esco: true, IOT: true },
+    relations: { product: true, farmer: true, IOT: true },
   };
 };
 

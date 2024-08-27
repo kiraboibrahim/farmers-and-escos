@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { OfferService } from './offer.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { UpdateOfferDto } from './dto/update-offer.dto';
+import { AcceptOrRejectOfferDto, UpdateOfferDto } from './dto/update-offer.dto';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Auth, GetUser } from '@auth/auth.decorators';
 import { Role } from '@role/role.constants';
@@ -41,16 +41,22 @@ export class OfferController {
     return this.offerService.findAll(query);
   }
 
+  @AlsoAllow(Role.FARMER)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @GetUser() user: User) {
+    this.offerService.setUser(user);
     return this.offerService.findOne(+id);
   }
 
   @AllowOnly(Role.FARMER)
-  @Patch(':id/accepts')
-  acceptOffer(@Param('id') id: string, @GetUser() user: User) {
+  @Patch(':id/response')
+  acceptOrRejectOffer(
+    @Param('id') id: string,
+    @GetUser() user: User,
+    @Body() acceptOrRejectOfferDto: AcceptOrRejectOfferDto,
+  ) {
     this.offerService.setUser(user);
-    return this.offerService.acceptOffer(+id);
+    return this.offerService.acceptOrRejectOffer(+id, acceptOrRejectOfferDto);
   }
 
   @ApiConsumes('multipart/form-data')

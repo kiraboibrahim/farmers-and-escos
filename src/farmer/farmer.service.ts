@@ -11,6 +11,8 @@ import { StorageService } from '@storage/storage.service';
 import { BaseService } from '@core/core.base';
 import { Installation } from '@installation/entities/installation.entity';
 import { getFarmerInstallationsPaginationConfig } from '@installation/installation.pagination.config';
+import { getFarmerFavoriteProductsPaginationConfig } from '@product/product.pagination.config';
+import { FavoriteProduct } from '@product/entities/favorite-product.entity';
 
 @Injectable()
 export class FarmerService extends BaseService {
@@ -18,6 +20,8 @@ export class FarmerService extends BaseService {
     @InjectRepository(Farmer) private farmerRepository: Repository<Farmer>,
     @InjectRepository(Installation)
     private installationRepository: Repository<Installation>,
+    @InjectRepository(FavoriteProduct)
+    private favoriteProductRepository: Repository<FavoriteProduct>,
     private storageService: StorageService,
   ) {
     super();
@@ -33,6 +37,14 @@ export class FarmerService extends BaseService {
       query,
       this.farmerRepository,
       FARMER_PAGINATION_CONFIG,
+    );
+  }
+
+  async findFarmerFavoriteProducts(farmerId: number, query: PaginateQuery) {
+    return await paginate(
+      query,
+      this.favoriteProductRepository,
+      getFarmerFavoriteProductsPaginationConfig(farmerId),
     );
   }
 

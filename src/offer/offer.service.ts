@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { UpdateOfferDto } from './dto/update-offer.dto';
+import { AcceptOrRejectOfferDto, UpdateOfferDto } from './dto/update-offer.dto';
 import { BaseService } from '@core/core.base';
 import { Product } from '@product/entities/product.entity';
 import { Farmer } from '@farmer/entities/farmer.entity';
@@ -75,23 +75,26 @@ export class OfferService extends BaseService {
   }
 
   async findOne(id: number) {
-    return await Offer.findOneBy({ id });
+    return await Offer.findById(id, this.user);
   }
 
-  async acceptOffer(id: number) {
+  async acceptOrRejectOffer(
+    id: number,
+    { isAccepted }: AcceptOrRejectOfferDto,
+  ) {
     const { id: farmerId } = this.user;
     const offer = await Offer.preload({
       id,
       farmer: { id: farmerId },
-      isAccepted: false,
+      isAccepted: null,
     });
+
     if (!!offer && offer.isExpired()) {
       throw new BadRequestException('Offer is already expired');
     }
-    return await Offer.update(
-      { id, farmer: { id: farmerId }, isAccepted: false },
-      { isAccepted: true },
-    );
+    isAccepted
+      ? await Offer.acceptOffer(id, farmerId)
+      : await Offer.rejectOffer(id, farmerId);
   }
 
   async uploadInvoice(id: number, invoice: Express.Multer.File) {

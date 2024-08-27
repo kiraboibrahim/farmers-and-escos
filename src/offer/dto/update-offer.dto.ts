@@ -1,6 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateOfferDto } from './create-offer.dto';
-import { Equals, IsOptional } from 'class-validator';
+import { Equals, IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateOfferDto extends PartialType(
   OmitType(CreateOfferDto, ['escoId', 'startDate', 'expiryDate']),
@@ -9,4 +9,9 @@ export class UpdateOfferDto extends PartialType(
   @Equals(null)
   @IsOptional()
   invoice: any;
+}
+
+export class AcceptOrRejectOfferDto {
+  @IsBoolean()
+  isAccepted: boolean;
 }

@@ -25,6 +25,8 @@ import {
 import { FARMER_PAGINATION_CONFIG } from '@farmer/farmer.pagination.config';
 import { UploadFarmerPhotosDto } from '@farmer/dto/upload-farmer-photos.dto';
 import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
+import { PRODUCT_PAGINATION_CONFIG } from '@product/product.pagination.config';
+import { IsPublic } from '@auth/auth.decorators';
 
 @ApiTags('Farmers')
 @Controller('farmers')
@@ -44,6 +46,16 @@ export class FarmerController {
   @Get()
   findAll(@Paginate() query: PaginateQuery) {
     return this.farmerService.findAll(query);
+  }
+
+  @ApiPaginationQuery(PRODUCT_PAGINATION_CONFIG)
+  @IsPublic()
+  @Get(':id/products/favorites')
+  findFarmerFavoriteProducts(
+    @Param('id') id: string,
+    @Paginate() query: PaginateQuery,
+  ) {
+    return this.farmerService.findFarmerFavoriteProducts(+id, query);
   }
 
   @ApiPaginationQuery(INSTALLATION_PAGINATION_CONFIG)

@@ -11,6 +11,7 @@ import { Product } from '@product/entities/product.entity';
 import { ProductCategory } from '@product-category/entities/product-category.entity';
 import { FavoriteProduct } from '@product/entities/favorite-product.entity';
 import { GalleryPhoto } from '../gallery/entities/gallery-photo.entity';
+import { RecommendedProduct } from '@product/entities/recommended-product.entity';
 
 const ENTITIES = [
   Esco,
@@ -20,6 +21,7 @@ const ENTITIES = [
   Iot,
   Offer,
   Product,
+  RecommendedProduct,
   ProductCategory,
   FavoriteProduct,
   GalleryPhoto,

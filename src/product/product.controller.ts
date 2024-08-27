@@ -83,6 +83,14 @@ export class ProductController {
     return this.productService.findAll(query);
   }
 
+  @ApiOkResponse({ description: "Returns the farmer's recommendations" })
+  @AllowOnly(Role.FARMER)
+  @Get('recommendations')
+  findRecommendations(@GetUser() user: User) {
+    this.productService.setUser(user);
+    return this.productService.findRecommendations();
+  }
+
   @IsPublic()
   @Get(':id/installations')
   findProductInstallations(

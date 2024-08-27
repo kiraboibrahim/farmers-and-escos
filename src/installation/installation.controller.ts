@@ -11,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { InstallationService } from './installation.service';
 import { CreateInstallationDto } from './dto/create-installation.dto';
-import { UpdateInstallationDto } from './dto/update-installation.dto';
+import {
+  AcceptOrRejectInstallationDto,
+  UpdateInstallationDto,
+} from './dto/update-installation.dto';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -67,6 +70,12 @@ export class InstallationController {
   @Get(':id/reviews')
   findInstallationReviews(@Param('id') id: string) {
     return this.installationService.findInstallationReviews(+id);
+  }
+
+  @IsPublic()
+  @Get(':id/performance')
+  findInstallationPerformance(@Param('id') id: string) {
+    return this.installationService.findInstallationPerformance(+id);
   }
 
   @IsPublic()
@@ -132,13 +141,17 @@ export class InstallationController {
   }
 
   @AllowOnly(Role.FARMER)
-  @Patch(':id/confirmations')
-  confirmInstallation(
+  @Patch(':id/response')
+  acceptOrRejectInstallation(
     @InstallationExists('id') id: string,
     @GetUser() user: User,
+    @Body() acceptOrRejectInstallationDto: AcceptOrRejectInstallationDto,
   ) {
     this.installationService.setUser(user);
-    return this.installationService.confirmInstallation(+id);
+    return this.installationService.acceptOrRejectInstallation(
+      +id,
+      acceptOrRejectInstallationDto,
+    );
   }
 
   @Patch(':id')
