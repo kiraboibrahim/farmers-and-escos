@@ -4,7 +4,7 @@ import { INestApplication, VersioningType } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { VERSION } from '@core/core.constants';
+import { API_VERSION } from '@core/core.constants';
 
 // Load IANA timezone names
 require('@js-joda/timezone');
@@ -30,7 +30,7 @@ async function bootstrap() {
 function setupVersioning(app: INestApplication) {
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: VERSION,
+    defaultVersion: API_VERSION,
   });
 }
 
@@ -50,7 +50,7 @@ function setupSwagger(app: INestApplication) {
   const documentConfig = new DocumentBuilder()
     .setTitle(TITLE)
     .setDescription(DESCRIPTION)
-    .setVersion(VERSION)
+    .setVersion(API_VERSION)
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, documentConfig);

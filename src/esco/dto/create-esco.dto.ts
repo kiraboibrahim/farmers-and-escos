@@ -6,6 +6,7 @@ import {
   IsLatitude,
   IsLongitude,
   IsNotEmpty,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import {
@@ -14,7 +15,7 @@ import {
   IsUnique,
 } from '@core/core.validators';
 import { Esco } from '@esco/entities/esco.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateEscoDto {
   @ApiProperty()
@@ -29,7 +30,8 @@ export class CreateEscoDto {
   @IsStrongPassword()
   password: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsFQDN({ require_tld: true })
   website: string;
 
@@ -43,11 +45,13 @@ export class CreateEscoDto {
   @IsNotEmpty()
   address: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsLatitude()
   latitude: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsLongitude()
   longitude: string;
 

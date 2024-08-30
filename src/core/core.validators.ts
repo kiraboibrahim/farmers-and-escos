@@ -12,11 +12,9 @@ import {
 import {
   AIRTEL_UG_REGEX,
   LYCA_UG_REGEX,
-  MIN_LOWERCASE_IN_PASSWORD,
-  MIN_PASSWORD_LENGTH,
-  MIN_SYMBOLS_IN_PASSWORD,
-  MIN_UPPERCASE_IN_PASSWORD,
   MTN_UG_REGEX,
+  PASSWORD_REQUIREMENTS,
+  SYMBOLS,
 } from '@core/core.constants';
 import { isUGPhoneNumber } from '@core/core.utils';
 import { EntityClass, EntityColumnName } from '@core/core.types';
@@ -112,11 +110,10 @@ export class _LoadEntities implements ValidatorConstraintInterface {
       findByColumnName,
       relations,
       allowMissing,
-      filter,
     ] = validationArguments.constraints;
     if (!isArray(value) || (isArray(value) && value.length === 0)) return false;
     const whereOptions = {
-      [findByColumnName]: In(value.filter((item) => filter(item))),
+      [findByColumnName]: In(value),
     };
     const entities = await entityClass.find({ where: whereOptions, relations });
     const entitiesExist = entities.length === value.length || allowMissing;
@@ -149,7 +146,6 @@ export const LoadEntities = function <T>({
   findByColumnName?: EntityColumnName<T> | 'id';
   relations?: FindOptionsRelations<T>;
   allowMissing?: boolean;
-  filter?: (value: any) => boolean;
 }) {
   return Validate(_LoadEntities, [
     entityClass,
@@ -157,7 +153,6 @@ export const LoadEntities = function <T>({
     findByColumnName,
     relations,
     allowMissing,
-    filter,
   ]);
 };
 
@@ -181,18 +176,13 @@ export const IsUGPhoneNumber = () => {
 };
 
 export const IsStrongPassword = () => {
-  const password_requirements = {
-    minLength: MIN_PASSWORD_LENGTH,
-    minLowercase: MIN_LOWERCASE_IN_PASSWORD,
-    minUppercase: MIN_UPPERCASE_IN_PASSWORD,
-    minSymbols: MIN_SYMBOLS_IN_PASSWORD,
-  };
-  const message = `Password doesn't meet the requirements: atleast ${MIN_PASSWORD_LENGTH} characters long, atleast ${MIN_LOWERCASE_IN_PASSWORD} lowercase letters, atleast ${MIN_UPPERCASE_IN_PASSWORD} uppercase letters, atleast ${MIN_SYMBOLS_IN_PASSWORD} symbols`;
-  return _IsStrongPassword(password_requirements, { message });
+  const { minLength, minLowercase, minSymbols } = PASSWORD_REQUIREMENTS;
+  const message = `Password should be atleast ${minLength} characters long with atleast ${minLowercase} lowercase letters, and ${minSymbols} symbols ${SYMBOLS}`;
+  return _IsStrongPassword(PASSWORD_REQUIREMENTS, { message });
 };
 
 export const IsStrongPIN = () => {
   const pinRegex = /[0-9]{6,}/;
-  const message = 'Your PIN should be atleast 6 digits long';
+  const message = 'PIN should be atleast 6 digits long';
   return Matches(pinRegex, { message });
 };

@@ -1,6 +1,5 @@
 import {
   IsBoolean,
-  isInt,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -30,17 +29,13 @@ export class CreateProductDto {
   @IsOptional()
   isFeatured: boolean;
 
-  @ApiProperty({
-    description:
-      'For existing categories, specify their IDs and for non-existing categories, specify their names and they will be automatically created',
-  })
+  @ApiProperty()
   @LoadEntities<ProductCategory>({
     entityClass: ProductCategory,
     accessEntityByProperty: 'categories',
     allowMissing: true,
-    filter: isInt,
   })
-  categoriesIds: number[] | string[];
+  categoriesIds: number[];
 
   @ApiProperty()
   @LoadEntity<Esco>({ entityClass: Esco, accessEntityByProperty: 'esco' })

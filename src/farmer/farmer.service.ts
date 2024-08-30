@@ -13,6 +13,9 @@ import { Installation } from '@installation/entities/installation.entity';
 import { getFarmerInstallationsPaginationConfig } from '@installation/installation.pagination.config';
 import { getFarmerFavoriteProductsPaginationConfig } from '@product/product.pagination.config';
 import { FavoriteProduct } from '@product/entities/favorite-product.entity';
+import { CreateProductRecommendationsDto } from '@product/dto/create-product-recommendations.dto';
+import { Product } from '@product/entities/product.entity';
+import { RecommendedProduct } from '@product/entities/recommended-product.entity';
 
 @Injectable()
 export class FarmerService extends BaseService {
@@ -22,6 +25,7 @@ export class FarmerService extends BaseService {
     private installationRepository: Repository<Installation>,
     @InjectRepository(FavoriteProduct)
     private favoriteProductRepository: Repository<FavoriteProduct>,
+    @InjectRepository(RecommendedProduct)
     private storageService: StorageService,
   ) {
     super();
@@ -30,6 +34,19 @@ export class FarmerService extends BaseService {
   async create(createFarmerDto: CreateFarmerDto) {
     const farmer = this.farmerRepository.create(createFarmerDto);
     return await Farmer.save(farmer);
+  }
+
+  async createProductRecommendations(
+    farmerId: number,
+    createProductRecommendationsDto: CreateProductRecommendationsDto,
+  ) {
+    const farmer = await Farmer.findOneOrFail({ where: { id: farmerId } });
+    const { products }: { products: Product[] } =
+      createProductRecommendationsDto as any;
+    return await RecommendedProduct.createFarmerRecommendations(
+      farmer,
+      products,
+    );
   }
 
   async findAll(query: PaginateQuery) {

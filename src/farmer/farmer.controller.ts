@@ -27,6 +27,7 @@ import { UploadFarmerPhotosDto } from '@farmer/dto/upload-farmer-photos.dto';
 import { INSTALLATION_PAGINATION_CONFIG } from '@installation/installation.pagination.config';
 import { PRODUCT_PAGINATION_CONFIG } from '@product/product.pagination.config';
 import { IsPublic } from '@auth/auth.decorators';
+import { CreateProductRecommendationsDto } from '@product/dto/create-product-recommendations.dto';
 
 @ApiTags('Farmers')
 @Controller('farmers')
@@ -40,6 +41,17 @@ export class FarmerController {
   @Post()
   create(@Body() createFarmerDto: CreateFarmerDto) {
     return this.farmerService.create(createFarmerDto);
+  }
+
+  @Post(':id/recommendations')
+  createProductRecommendations(
+    @Param('id') farmerId: string,
+    @Body() createProductRecommendationsDto: CreateProductRecommendationsDto,
+  ) {
+    return this.farmerService.createProductRecommendations(
+      +farmerId,
+      createProductRecommendationsDto,
+    );
   }
 
   @ApiPaginationQuery(FARMER_PAGINATION_CONFIG)

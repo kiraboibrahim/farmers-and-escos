@@ -40,7 +40,6 @@ export class Product extends AutoCreatedDateTime {
   photo4: string;
 
   @ManyToMany(() => ProductCategory, {
-    cascade: ['insert', 'update'],
     eager: true,
   })
   @JoinTable()

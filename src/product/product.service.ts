@@ -36,28 +36,12 @@ export class ProductService extends BaseService {
   async create(createProductDto: CreateProductDto) {
     const { categories, esco }: { categories: ProductCategory[]; esco: Esco } =
       createProductDto as any;
-    const { categoriesIds } = createProductDto;
     const product = this.productRepository.create({
       ...createProductDto,
+      categories,
       esco,
     });
-    product.categories = this.fillMissingCategories(categoriesIds, categories);
     return Product.save(product);
-  }
-
-  private fillMissingCategories(
-    categoriesIds: any[],
-    categories: ProductCategory[],
-  ) {
-    return categoriesIds.map((categoryId: any) => {
-      let foundCategory = categories.find(
-        (category) => category.id === +categoryId,
-      );
-      if (!foundCategory) {
-        foundCategory = this.productRepository.create({ name: categoryId });
-      }
-      return foundCategory;
-    });
   }
 
   async findRecommendations() {
@@ -128,10 +112,7 @@ export class ProductService extends BaseService {
       updateProductDto as any;
     const { categoriesIds } = updateProductDto;
     if (categoriesIds) {
-      product.categories = this.fillMissingCategories(
-        categoriesIds,
-        categories,
-      );
+      product.categories = categories;
       return await Product.save(product);
     }
   }

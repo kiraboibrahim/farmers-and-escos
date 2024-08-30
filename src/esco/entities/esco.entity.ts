@@ -28,7 +28,7 @@ export class Esco extends BaseEntity {
   @Exclude()
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   website: string;
 
   @Column()
@@ -38,10 +38,10 @@ export class Esco extends BaseEntity {
   @Column({ nullable: true })
   address: string;
 
-  @Column()
+  @Column({ nullable: true })
   latitude: string;
 
-  @Column()
+  @Column({ nullable: true })
   longitude: string;
 
   @Column()
